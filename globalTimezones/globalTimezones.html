@@ -1,0 +1,158 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link href="https://fonts.googleapis.com/css?family=Bree+Serif" rel="stylesheet">
+	<!-- Bootstrap -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="moment.js"></script>
+	<script src="moment-timezone-with-data.js"></script>
+	<script src="timezones.js"></script>
+
+	<style>
+
+		body {
+			font-family: "Bree Serif";
+		}
+
+		div.counter {
+			overflow: hidden;
+			padding: 4px;
+			margin: 5px;
+			max-width: 20%;
+		}
+
+		div.form-group {
+			position: relative;
+		}
+
+		table {
+			table-layout: fixed;
+		}
+
+	</style>
+
+	<title>Test Site</title>
+
+</head>
+
+<body>
+	<!--Navigation Bar-->
+	<nav class="navbar navbar-static-top navbar-default" style="text-align:center;background-color:rgb(255,255,255)">
+		<div class="container-fluid">
+			<ul class="nav navbar-nav" style="text-align:center;display:inline-block;float:none">
+				<li><a href="../index.html">Home</a></li>
+				<li class="dropdown">
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#">My Projects
+						<span class="caret"></span>
+					</a>
+					<ul class="dropdown-menu">
+						<li><a href="#">Global Timezones</a></li>
+						<li><a href="../dogBreedFinder/dogBreedFinder.html">Dog Breed Finder</a></li>
+						<li><a href="../popularLocationsDemo/flickrTest.html">Popular Locations Tech Demo</a></li>
+					</ul>
+				</li>
+				<li data-toggle="modal" data-target="#contactModal"><a href="#">Contact</a></li>
+				<li><a href="../Matthew_Antosiak.pdf">Resume</a></li>
+			</ul>
+			<ul class="nav navbar-nav navbar-right">
+				<li data-toggle="modal" data-target="#aboutModal"><a href="#">About</a></li>
+			</ul>
+		</div>
+	</nav>
+	<!--Contact Modal-->
+	<div id="contactModal" class="modal fade" fole="dialog">
+		<div class="modal-dialog modal-sm">
+			<!--Modal Content-->
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">Contact</h4>
+				</div>
+				<div class="modal-body">
+					<span><strong>Cell Phone:</strong>  650-380-6982 </span><br>
+					<span><strong>Email:</strong> matthewaantosiak@gmail.com</span>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--About Modal-->
+	<div id="aboutModal" class="modal fade" fole="dialog">
+		<div class="modal-dialog modal-lg">
+			<!--Modal Content-->
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">About</h4>
+				</div>
+				<div class="modal-body">
+					<span><strong>About this project:</strong><br> This is the first webpage that I constructed. This was done as an excercise to reinforce the technologies that I've learned. </span><br><br>
+					
+					<span><strong>Technical Overview:</strong><br> All of the time zone information is obtained from the moment.js
+					library and is displayed in the table. A web worker constantly updates the table's time. The filter uses string-matching to filter out table entries.</span>
+
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!--Time Elapsed-
+	<div class="container">
+		<div class="panel panel-default">
+			<div class="panel-heading">Filter</div>
+			<div class="panel-body">
+				<div class="counter well well-lg">
+					<span class="glyphicon glyphicon-time"></span>
+					<span>JS Worker Counter: </span>
+					<span id="counter">0</span>
+				</div>
+			</div>
+		</div>
+	</div>-->
+
+	<!--Timetable Container-->
+	<div class="container">
+		<form class="form-inline" role="form">
+			<div class="well" style="text-align:center">
+				<div class="form-group">
+					<span class="glyphicon glyphicon-globe"></span>
+					<input id="countryFilter" type="text" name="Country" placeholder="Country">
+				</div>
+				<div class="form-group">
+					<span class="glyphicon glyphicon-home"></span>
+					<input id="cityFilter" type="text" name="City" placeholder="City">
+				</div>
+				<div class="form-group">
+					<span class="glyphicon glyphicon-time"></span>
+					<input id="timeZoneFilter" type="text" name="TimeZone" placeholder="Timezone">  
+				</div>
+				<div class="form-group">
+					<button onclick="clearTextFields()" type="button" class="btn-primary">
+						<span class="glyphicon glyphicon-repeat"></span>Clear</button>             
+					</div>
+
+				</form>
+			</div>
+			<table id="timeTable" class="table table-striped table-responsive">
+				<tr>
+					<th onclick="sortByCountry()">Country</th>
+					<th onclick="sortByCity()">City</th>
+					<th onclick="sortByTimeZone()">Time Zone</th>
+					<th onclick="console.log('sortByTime')">Time</th>
+				</tr>
+			</table>
+		</div>
+
+	</body>
+	</html>

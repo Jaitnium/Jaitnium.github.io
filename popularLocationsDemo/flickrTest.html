@@ -1,0 +1,952 @@
+<html>
+<head>  
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<!--Google maps API-->
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAy7OquTpBtqu6MW1kZg4vUdP1iDxPzycQ&libraries=visualization"></script>
+	<link href="https://fonts.googleapis.com/css?family=Bree+Serif" rel="stylesheet">
+
+	<style>
+
+		.navbar .navbar-nav {
+			display: inline-block;
+			float: none;
+		}
+		.navbar .navbar-collapse {
+			text-align: center;
+		}
+
+		body {
+			font-family: "Bree Serif";
+		}
+
+	</style>  
+
+	<!--flickr API Script-->
+	<script>  
+		//API key
+		api_key = "082ca8bbb880bc514637527a4bfbe557";
+		//User ID
+		//user_id = "144329374@N06";
+
+		/*Given a flikr api method, and any number of arguments in the format of:
+		argumentName=value, return the url to be called using getJSON. This url will not
+		call a callback function, and will return a JSON file*/
+		function makeAPIURL(method /*, &parameter1=val1, &parameter2=val2, ...*/) {
+			apiurl = "https://api.flickr.com/services/rest/?" + "&method=" + method;
+
+			/*Append any arguments=value*/
+			for(var i = 1; i < arguments.length; i++) {
+				apiurl += "&" + arguments[i];
+			}
+
+			apiurl += "&api_key=" + api_key + 
+			/*"&user_id=" + user_id +*/
+			"&format=json" +
+			"&nojsoncallback=1";
+
+
+			//console.log("args: " + arguments.length);
+
+			return apiurl;
+		}
+
+		/*Given the already built flickr API url, and the page number to request
+		Request the secified page and return the JSON response*/
+		function retrievePage(api_url, page_num) {
+			api_url = api_url + "&page=" + page_num;
+			var jsonRet;
+			$.ajax({
+				url: api_url,
+				dataType: "json",
+				async: false,
+				success: function(json) {
+					console.log("Retrieve page " + page_num + " :" + api_url);
+					jsonRet = json;
+				}
+			});			
+			//Return the JSON page
+			return jsonRet;
+		}
+
+		/*Given a photo_id, use flickr.photos.geo.getLocation to fetch and 
+		return a photo's JSON page*/
+		function retrievePhoto(photo_id) {
+			console.log("Retrieving photo of id: " + photo_id);
+			api_url = makeAPIURL("flickr.photos.geo.getLocation", "photo_id=" + photo_id);
+			var jsonRet;
+			$.ajax({
+				url: api_url,
+				dataType: "json",
+				async: false,
+				success: function(json) {
+					jsonRet = json;
+				}
+			});
+			//Return the JSON page
+			return jsonRet;			
+		}
+
+		/*Given a string for a place to find
+		Use flickr's flickr.places.find method to perform an AJAX call, and return
+		the responded JSON page*/
+		function fetchPlaceJSON(placeToFind) {
+			//Create api url to get the location info from flickr
+			api_url = makeAPIURL("flickr.places.find", "query=" + placeToFind);
+			var jsonRet;
+
+			/*Get the JSON file with all matching string locations using the flickr API*/
+			$.ajax({
+				url: api_url,
+				dataType: "json",
+				async: false,
+				success: function(json) {
+					console.log(json.places);
+					//At this point we have the JSON file with places that are related to the queried string
+					//FOR NOW, I'll simply use the first object in the returned JSON file, but this may need to be changed later
+					console.log(json.places.place[0]);
+
+					jsonRet = json;
+					placeFound = json.places.place[0]; 
+
+					//Tell the user what was found
+					$("#retStatement").text('Found location "' + placeFound._content + '" which is type ' + placeFound.place_type);
+				}
+			});
+			return jsonRet;
+		}
+/*
+		function queryflickr() {
+			//placeToFind is the string given by the user
+			//placeFound is the first entry taken from the return JSON file
+			//numberOfHits is the number of specified hits that the user wants to see displayed
+			//hitsDisplayed is the number of hits displayed thus far
+			var placeToFind, placeFound, numberOfHits, hitsDisplayed = 0;
+			var api_url;
+			//Stores the json page of the place found, a page of json photo ids and a page of
+			//a single photo json respectively
+			var jsonPlace, jsonPage, jsonPhoto;
+			//Google maps marker reference
+			var marker;
+
+			//Fetch the string in the input field
+			placeToFind = $("#placeToFind").val();
+			jsonPlace = fetchPlaceJSON(placeToFind);
+			//At this point we have the JSON file with places that are related to the queried string
+			//FOR NOW, we'll simply use the first object in the returned JSON file, but this may need to be changed later
+			placeFound = jsonPlace.places.place[0];
+
+			console.log("placefound " + placeFound._content);
+
+			//Determine the number of hits the user wants, default is 250 is none specified
+			numberOfHits = $("#numberOfHits").val();
+			if(!numberOfHits) {
+				numberOfHits = 250;
+			}
+
+			console.log(numberOfHits);
+
+			//Build a request to the placeFound, the returned JSON will be the first page
+			api_url = makeAPIURL("flickr.photos.search", "woe_id=" + placeFound.woeid, "place_id=" + placeFound.place_id);
+
+			//Retrieve the first page so we know how many pages to iterate through
+			jsonPage = retrievePage(api_url, 1);
+			console.log(jsonPage);
+
+			//For each PAGE, such that we don't go over the maximum number of pages
+			for(var i = 1; i < jsonPage.photos.pages; i++) {
+				//Retrieve the next page
+				//This retrieves the first page as well, but it's easier to read
+				jsonPage = retrievePage(api_url, i);
+
+				//console.log(jsonPage);
+
+				//For every photo in the jsonPage's photo id array
+				for(var j = 0; j < jsonPage.photos.photo.length; j++) {
+					console.log("Page Number: " + i + " Photo number: " + j);
+					//If we've displayed the indicated number of hits, exit
+					if(hitsDisplayed == numberOfHits) {
+						console.log("DONE! HitsDisplayed: " + hitsDisplayed);
+
+						for(var k = 0; k < markers.length; k++) {
+							//Display an infoWindow for each marker so we can count them easily
+							var infowindow = new google.maps.InfoWindow({
+								content:"Index: " + k
+							});
+							infowindow.open(map,markers[k]);
+						}
+
+						return;
+					}
+
+					//Retrieve the photo JSON
+					jsonPhoto = retrievePhoto(jsonPage.photos.photo[j].id);
+
+					//console.log(jsonPhoto);
+					//Create a google maps marker and add it to the marker array
+					//SET IT TO MAP LATER!!!!!!!!
+					marker = new google.maps.Marker({
+						position: new google.maps.LatLng(jsonPhoto.photo.location.latitude,
+							jsonPhoto.photo.location.longitude),
+					});
+					marker.setMap(map);
+					//Add the reference to the marker to the marker array
+					markers.push(marker);
+
+					//Increment the amount of photos displayed
+					hitsDisplayed++;
+					console.log("HitsDisplayed: " + hitsDisplayed);
+				}
+			}
+
+			console.log("markers.length: " + markers.length)
+
+		}*/
+/*
+		function queryflickr() {
+
+			var hitsDisplayed = 0;
+			placeToFind = $("#placeToFind").val();
+			//Create api url to get the location info from flickr
+			var api_url = makeAPIURL("flickr.places.find", "query=" + placeToFind);
+
+			console.log("apiurl:" + apiurl);
+
+			//Retrieves the JSON corresponding to the queried string
+			$.getJSON(api_url, function(jsonPlace) {
+				console.log(jsonPlace.places);
+				//At this point we have the JSON file with places that are related to the queried string
+				//FOR NOW, I'll simply use the first object in the returned JSON file, but this may need to be changed later
+				console.log(jsonPlace.places.place[0]);
+
+				//First place index, we'll use the photos from this location
+				placeFound = jsonPlace.places.place[0]; 
+
+				//Tell the user what was found
+				$("#retStatement").text('Found location "' + placeFound._content + '" which is type ' + placeFound.place_type);
+
+				//Get photos of the place from flickr
+				//Given the photos.search method, world ID, place ID
+				//IN THE FUTURE: Add an accuracy field that changes depending on the place_type
+				api_url = makeAPIURL("flickr.photos.search", "woe_id=" + placeFound.woeid, "place_id=" + placeFound.place_id);
+
+				console.log("Quering flickr for place's photos using apiurl:" + api_url);
+				//Retrieve the JSON for the page, by default it will be the first page
+				$.getJSON(api_url, function(initPage) {
+
+
+					console.log(initPage);
+
+					//Determine the number of hits the user wants, default is 250 is none specified
+					var numberOfHits = $("#numberOfHits").val();
+					if(!numberOfHits) {
+						numberOfHits = 250;
+					}
+
+					//Iterate through EACH page until we've displayed the number of requested hits
+					//or until there are no more pages
+					for(var i = 1; i < initPage.photos.pages; i++) {
+
+						//Construct the api_url for the next page
+						//This will retrieve the first page again, but this makes it easier to read
+						api_url = makeAPIURL("flickr.photos.search", "woe_id=" + placeFound.woeid, "place_id=" + placeFound.place_id, "page_num=" + i);
+
+						//Make the JSON request for the page
+						$.getJSON(api_url, function(jsonPage) {
+
+							//At this point we have a single page with 250 photo entries
+							for(var j = 0; j < jsonPage.photos.photo.length; j++) {
+
+								console.log("Page Number: " + i + " Photo number: " + j);
+								if(hitsDisplayed == numberOfHits) {
+									console.log("DONE! HitsDisplayed: " + hitsDisplayed);
+
+									for(var k = 0; k < markers.length; k++) {
+										//Display an infoWindow for each marker so we can count them easily
+										var infowindow = new google.maps.InfoWindow({
+											content:"Index: " + k
+										});
+										infowindow.open(map,markers[k]);
+									}
+
+									return;
+								}
+
+								//console.log(json2.photos.photo[i].id);
+								api_url = makeAPIURL("flickr.photos.geo.getLocation", "photo_id=" + jsonPage.photos.photo[j].id);
+								//Get the geolocation for the given photo
+								$.getJSON(api_url, function(jsonPhoto) {
+									//console.log(json3);
+									var marker=new google.maps.Marker({
+										position: new google.maps.LatLng(jsonPhoto.photo.location.latitude, jsonPhoto.photo.location.longitude),
+									});
+									marker.setMap(map);
+									markers.push(marker);
+									
+									//Increment the amount of photos displayed
+									hitsDisplayed++;
+									console.log("HitsDisplayed: " + hitsDisplayed);
+								});
+
+							}
+						});
+					}
+
+				});
+			})
+			.fail(function(jsonPlace) {
+				console.log("error")
+			})
+		}*/
+
+      //Speedy
+      function queryflickr() {
+
+      	placeToFind = $("#placeToFind").val();
+			//Create api url to get the location info from flickr
+			api_url = makeAPIURL("flickr.places.find", "query=" + placeToFind);
+
+			console.log("apiurl:" + apiurl);
+
+			//Retrieves the JSON
+			$.getJSON(api_url, function(json) {
+				console.log(json.places);
+				//At this point we have the JSON file with places that are related to the queried string
+				//FOR NOW, I'll simply use the first object in the returned JSON file, but this may need to be changed later
+				console.log(json.places.place[0]);
+
+				placeFound = json.places.place[0]; 
+
+				//Tell the user what was found
+				$("#retStatement").text('Found location "' + placeFound._content + '" which is type ' + placeFound.place_type);
+
+				//Get photos of the place from flickr
+				//Given the photos.search method, world ID, place ID
+				//IN THE FUTURE: Add an accuracy field that changes depending on the place_type
+				var api_url = makeAPIURL("flickr.photos.search", "woe_id=" + placeFound.woeid, "place_id=" + placeFound.place_id);
+				//api_url = makeAPIURL("flickr.photos.search");
+
+				console.log("Quering flickr for place's photos using apiurl:" + api_url);
+				//Retrieve the JSON
+				$.getJSON(api_url, function(json2) {
+					console.log(json2);
+
+					//At this point we have a single page with 250 photo entries
+					for(var i = 0; i < json2.photos.photo.length; i++) {
+						//console.log(json2.photos.photo[i].id);
+						api_url = makeAPIURL("flickr.photos.geo.getLocation", "photo_id=" + json2.photos.photo[i].id);
+						//Get the geolocation for the given photo
+						$.getJSON(api_url, function(json3) {
+							//console.log(json3);
+							var marker=new google.maps.Marker({
+								position: new google.maps.LatLng(json3.photo.location.latitude, json3.photo.location.longitude),
+							});
+							marker.setMap(map);
+							markers.push(marker);
+						});
+					}
+
+				});
+			})
+			.fail(function(json) {
+				console.log("error")
+			})
+		}
+
+		//Filter the place dropdowns to show based on the month and year dropdown selections
+		//Set the text of the button called from
+		//Set place dropdowns if possible (both month +  year are valid, plus places to show in folder)
+		function filterClick(id, text) {
+			$(id).text(text)
+			//Remove any/all dropdown options already existing
+			$("#placeFiles").empty();
+			$("#place").text("Place");
+			//Set the new dropdown options
+			setPlaceDropdown();
+		}
+
+		//Called whenever the month or year field is changed
+		//Updates the place dropdown according to the new directory location
+		function setPlaceDropdown() {
+			//$('#placeFiles').append(<li><a href="javascript:void(0);" onclick="$('#place').text( $(this).text() )">Edinburgh</a></li>);
+
+			year = $('#year').text();
+			month = $('#month').text();
+
+			console.log("setPlaceDropdown Start..")
+			//Check for existence of mapData directory
+			$.ajax({
+				url:'mapData',
+				error: function() {
+					//Data points directory doesn't exist
+					console.log("ERROR: expected directory named 'mapData'. Exiting...");
+					return
+				},
+				success: function() {
+					//Directory does exist
+					console.log("mapData exists..");
+
+					//Check for existence of specified year subdirectory
+					$.ajax({
+						url:'mapData/' + year,
+						error: function() {
+							console.log("ERROR: no mapData for the specified year:" + year + ". Exiting...");
+							return
+						},
+						success: function() {
+
+						//Directory does exist
+						console.log("mapData/" + year + " subdirectory exists...");
+
+							//Check for existence of specified month subdirectory
+							$.ajax({
+								url:'mapData/' + year + "/" + month,
+								error: function() {
+									console.log("ERROR: no month " + month + " subdirectory found. Exiting...");
+									return
+								},
+								success: function() {
+									//At this point we know the directory exists
+									//Get everything at subdirectory
+									$.get("mapData/" + year + "/" + month +"/.", function(data) {
+
+										//console.log(data);
+										//Set filesRet to show files at subdirectory
+										//Try to load the data into filesReturned
+										try {
+											$("#filesReturned").html(data);
+											$("#filesReturned").find('a:contains(".json")').each(function () {
+												//console.log("First try: " + this.href.replace("http:///", "").split("/"))
+
+												var array = this.href.replace(window.location.host, "").replace("http:///", "").split("/");
+                                            	//The last array element wil be the fileName
+                                            	var fileName = array[array.length-1];
+                                            	console.log("Filename: " + array[array.length-1]);
+                                            	var fullPath = "mapData/" + year + "/" + month + "/" + fileName;
+                                            	console.log("FullPath: " + fullPath);
+
+												//Now parse the place from the filename and add that option to the placeDropdown
+												array = fileName.split("_");
+												var place = array[0];
+												console.log("Place: " + place);
+												$("#placeFiles").append("<li><a href='javascript:void(0);' onclick='$(&#34;#place&#34;).text($(this).text())'>" + place + "</a></li>")
+											});
+										}
+										//If error then this isn't being run locally
+										catch(err) {
+										//For each .json file found
+										//Add it's entry to the list of dropdown options
+										$(data).find('a:contains(".json")').each(function () {
+											var array = this.href.replace(window.location.host, "").replace("http:///", "").split("/");
+                                            //The last array element wil be the fileName
+                                            var fileName = array[array.length-1];
+                                            console.log("Filename: " + array[array.length-1]);
+                                            var fullPath = "mapData/" + year + "/" + month + "/" + fileName;
+                                            console.log("FullPath: " + fullPath);
+
+											//Now parse the place from the filename and add that option to the placeDropdown
+											array = fileName.split("_");
+											var place = array[0];
+											console.log("Place: " + place);
+
+											$("#placeFiles").append("<li><a href='javascript:void(0);' onclick='$(&#34;#place&#34;).text($(this).text())'>" + place + "</a></li>")
+										});
+									}
+								});
+								}
+							});
+						}
+					});
+				}
+			});
+
+			return			
+
+		}
+
+		function setMapZoom(place_type) {
+			if(place_type == "country") {
+				map.setZoom(6);
+			}
+			if(place_type == "locality") {
+				map.setZoom(11);
+			}
+		}
+
+		function setMapCenter(place) {
+			//Create api url to get the location info from flickr
+			api_url = makeAPIURL("flickr.places.find", "query=" + place);
+
+			/*Get the JSON file with all matching string locations using the flickr API*/
+			$.ajax({
+				url: api_url,
+				dataType: "json",
+				success: function(json) {
+					//At this point we have the JSON file with places that are related to the queried string
+					//FOR NOW, I'll simply use the first object in the returned JSON file, but this may need to be changed later
+					placeFound = json.places.place[0]; 
+
+					//set Center
+					//console.log(placeFound.latitude + " " + placeFound.longitude)
+					map.setCenter(new google.maps.LatLng(placeFound.latitude, placeFound.longitude));
+					setMapZoom(placeFound.place_type);
+				}
+			});
+		}
+
+		function readJSONFile(path) {
+			console.log("About to read JSON file..");
+
+			$.ajax({
+				dataType: 'json',
+				url: path,
+				error: function() {
+					//Data points directory doesn't exist
+					console.log("ERROR: couldn't read JSON file '" + path + "'. Exiting...");
+					document.getElementById("displayBtn").disabled = false;
+					return					
+				},
+				success: function(json) {
+					console.log(json);
+					console.log(json.photos.photo[0]);
+					for(var i = 0; i < json.photos.photo.length; i++) {
+
+                    	//Circle
+                    	var myIcon = new google.maps.MarkerImage("http://worldartsme.com/images/clip-art-red-dot-clipart-1.jpg", null, null, null, new google.maps.Size(10,10));
+
+                    	//Camera
+						//var myIcon = new google.maps.MarkerImage("http://icons.iconarchive.com/icons/pelfusion/long-shadow-media/512/Camera-icon.png", null, null, null, new google.maps.Size(20,20));
+
+						var marker=new google.maps.Marker({
+							icon: myIcon,
+							position: new google.maps.LatLng(json.photos.photo[i].latitude, json.photos.photo[i].longitude)
+						});
+						//console.log(typeof(json.photos.photo[i].latitude));
+						//Don't show markers by default
+						//marker.setMap(map);
+						markers.push(marker);
+					}
+
+					$("#numDisplayed").text(json.photos.photo.length);
+
+					makeHeatMap();
+					//Show heatmap by default
+					heatmap.setMap(map);
+
+					/*Enable button*/
+					document.getElementById("displayBtn").disabled = false;
+				}
+			});
+		}
+
+		function readJSONFiles() {
+			/*Disable "Display Locations" btn until done*/
+			console.log("disabling btn")
+			document.getElementById("displayBtn").disabled = true;
+			/*Clear any other markers that exist*/
+			clearMarkers()
+			clearHeatMap()
+
+			year = $('#year').text();
+			month = $('#month').text();
+			place = $('#place').text();
+
+			/*Exit if no entry*/
+			if(place == "Place") {
+				printf("ERROR: No place selected");
+				return;
+			}
+
+			console.log(year);
+			console.log(month);
+
+			//Check for existence of mapData directory
+			$.ajax({
+				url:'mapData',
+				contentType: 'text/plain',
+				error: function() {
+					//Data points directory doesn't exist
+					console.log("ERROR: expected directory named 'mapData'. Exiting...");
+					document.getElementById("displayBtn").disabled = false;
+					return
+				},
+				success: function() {
+					//Directory does exist
+					console.log("mapData exists..");
+
+					//Check for existence of specified year subdirectory
+					$.ajax({
+						url:'mapData/' + year,
+						contentType: 'text/plain',
+
+						error: function() {
+							console.log("ERROR: no mapData for the specified year:" + year + ". Exiting...");
+							document.getElementById("displayBtn").disabled = false;
+							return
+						},
+						success: function() {
+
+							//Directory does exist
+							console.log("mapData/" + year + " subdirectory exists...");
+
+							//Check for existence of specified month subdirectory
+							$.ajax({
+								url:'mapData/' + year + "/" + month,
+								contentType: 'text/plain',
+
+								error: function() {
+									console.log("ERROR: no month " + month + " subdirectory found. Exiting...");
+									document.getElementById("displayBtn").disabled = false;
+									return;
+								},
+								success: function() {
+									console.log("SUCCESS!")
+									fileName = place + "_" + month + "_" + year + ".json"
+									//Populate map with data point
+									readJSONFile('mapData/' + year + "/" + month + "/" + fileName);
+									//Set the map center
+									setMapCenter(place);
+								}
+							});
+						}
+					});
+				}
+			});
+
+			return
+		}
+
+		/**Google API Script**/
+		var myCenter = new google.maps.LatLng(51.508742,-0.120850);
+		var map;
+		var markers = [];
+		var heatMapData = [];
+		var heatmap;
+
+		function initialize() {
+			var mapProp = {
+				center:myCenter,
+				zoom:5,
+				mapTypeId:google.maps.MapTypeId.ROADMAP
+			};
+
+			map=new google.maps.Map(document.getElementById("googleMap"),mapProp);
+
+			/*Doesn't allow the user to click "Display Locations" until the map has loaded
+			google.maps.event.addListener(map, 'idle', function(){
+    			//Enable the button once the map goes idle
+    			document.getElementById("displayBtn").disabled = false;
+    		});*/
+    	}
+
+    	function showMarkers() {
+    		console.log("showMarkers called, length: " + markers.length);
+    		for(var i = 0; i < markers.length; i++) {
+    			markers[i].setMap(map);
+    		}
+    	}
+
+    	function toggleMarkers() {
+    		//disable btn
+    		document.getElementById("markerToggle").disabled = true;
+
+    		 //Have google maps enable the btn once it goes idle
+    		 google.maps.event.addListenerOnce(map, 'idle', function() {
+    			//enable btn
+    			document.getElementById("markerToggle").disabled = false;
+    		});
+
+    		 console.log(markers.length)
+    		 for(var i = 0; i < markers.length; i++) {
+    		 	if(markers[i].getMap() == null) {
+    		 		markers[i].setMap(map);
+    		 	}
+    		 	else {
+    		 		markers[i].setMap(null);
+    		 	}
+    		 }
+
+    		//Very hacky..
+    		//Slightly adjust the center so the idle function triggers
+    		var centerlat = map.getCenter().lat();
+    		var centerlng = map.getCenter().lng() + 0.000000001;
+    		recenter = new google.maps.LatLng(centerlat, centerlng);
+    		map.setCenter(recenter);
+    	}
+
+    	function clearMarkers() {
+    		for(var i = 0; i < markers.length; i++) {
+    			markers[i].setMap(null);
+    		}
+    		markers = [];
+    	}
+
+    	function clearHeatMap() {
+    		heatMapData = [];
+    		if(heatmap != null) {
+    			heatmap.setMap(null)
+    		}
+    	}
+
+    	function makeHeatMap() {
+    		console.log("marker length: " + markers.length);
+    		for(var i = 0; i < markers.length; i++) {
+				//heatMapData.push(new google.maps.LatLng(markers[i].getPosition().lat(), markers[i].getPosition().lng()));
+				heatMapData.push({location: new google.maps.LatLng(markers[i].getPosition().lat(), markers[i].getPosition().lng()), weight: 1});
+			}
+
+			heatmap = new google.maps.visualization.HeatmapLayer({
+				data: heatMapData,
+				radius: 10,
+				opacity: 1.0,
+				maxIntensity: 10
+			});
+		}
+
+		function toggleHeatmap() {
+
+    		//disable btn
+    		document.getElementById("heatmapToggle").disabled = true;
+
+    		 //Have google maps enable the btn once it goes idle
+    		 google.maps.event.addListenerOnce(map, 'idle', function() {
+    			//enable btn
+    			document.getElementById("heatmapToggle").disabled = false;
+    		});
+
+    		 heatmap.setMap(heatmap.getMap() ? null : map);
+
+			 //Very hacky..
+    		//Slightly adjust the center so the idle function triggers
+    		var centerlat = map.getCenter().lat();
+    		var centerlng = map.getCenter().lng() + 0.000000001;
+    		recenter = new google.maps.LatLng(centerlat, centerlng);
+    		map.setCenter(recenter);
+    	}
+
+    	function changeGradient() {
+    		var gradient = [
+    		'rgba(0, 255, 255, 0)',
+    		'rgba(0, 255, 255, 1)',
+    		'rgba(0, 191, 255, 1)',
+    		'rgba(0, 127, 255, 1)',
+    		'rgba(0, 63, 255, 1)',
+    		'rgba(0, 0, 255, 1)',
+    		'rgba(0, 0, 223, 1)',
+    		'rgba(0, 0, 191, 1)',
+    		'rgba(0, 0, 159, 1)',
+    		'rgba(0, 0, 127, 1)',
+    		'rgba(63, 0, 91, 1)',
+    		'rgba(127, 0, 63, 1)',
+    		'rgba(191, 0, 31, 1)',
+    		'rgba(255, 0, 0, 1)'
+    		]
+    		heatmap.set('gradient', heatmap.get('gradient') ? null : gradient);
+    	}
+
+    	function changeOpacity() {
+    		document.getElementById('opacityVal').innerHTML = document.getElementById('opacityRange').value;
+
+			//heatmap.set('maxIntensity', heatmap.get('maxIntensity') ? null : 5.0);
+			heatmap.set('opacity', document.getElementById('opacityRange').value);
+		}
+
+		function changeRadius() {
+			document.getElementById('radiusVal').innerHTML = document.getElementById('radiusRange').value;
+
+			//heatmap.set('maxIntensity', heatmap.get('maxIntensity') ? null : 5.0);
+			heatmap.set('radius', document.getElementById('radiusRange').value);
+		}
+
+		function changeIntensity() {
+			document.getElementById('intensityVal').innerHTML = document.getElementById('intensityRange').value;
+
+			//heatmap.set('maxIntensity', heatmap.get('maxIntensity') ? null : 5.0);
+			heatmap.set('maxIntensity', document.getElementById('intensityRange').value);
+		}
+
+		google.maps.event.addDomListener(window, 'load', initialize);
+
+	</script>
+</head>  
+<body>  
+
+	<!--Navigation Bar-->
+	<nav class="navbar navbar-static-top navbar-default" style="text-align:center;background-color:rgb(255,255,255);margin:0px">
+		<div class="container-fluid">
+			<ul class="nav navbar-nav" style="text-align:center;display:inline-block;float:none">
+				<li><a href="../index.html">Home</a></li>
+				<li class="dropdown">
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#">My Projects
+						<span class="caret"></span>
+					</a>
+					<ul class="dropdown-menu">
+						<li><a href="../globalTimezones/globalTimezones.html">Global Timezones</a></li>
+						<li><a href="../dogBreedFinder/dogBreedFinder.html">Dog Breed Finder</a></li>
+						<li><a href="#">Popular Locations Tech Demo</a></li>
+					</ul>
+				</li>
+				<li data-toggle="modal" data-target="#contactModal"><a href="#">Contact</a></li>
+				<li><a href="../Matthew_Antosiak.pdf">Resume</a></li>
+			</ul>
+			<ul class="nav navbar-nav navbar-right">
+				<li data-toggle="modal" data-target="#aboutModal"><a href="#">About</a></li>
+			</ul>
+		</div>
+	</nav>
+	<!--Contact Modal-->
+	<div id="contactModal" class="modal fade" fole="dialog">
+		<div class="modal-dialog modal-sm">
+			<!--Modal Content-->
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">Contact</h4>
+				</div>
+				<div class="modal-body">
+					<span><strong>Cell Phone:</strong>  650-380-6982 </span><br>
+					<span><strong>Email:</strong> matthewaantosiak@gmail.com</span>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--About Modal-->
+	<div id="aboutModal" class="modal fade" fole="dialog">
+		<div class="modal-dialog modal-lg">
+			<!--Modal Content-->
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">About</h4>
+				</div>
+				<div class="modal-body">
+					<span><strong>About this project:</strong><br> The ultimate goal of this project is create a webpage that will show the most popular locations to travel to around the world. You'll be able to enter in a city from any country at any time of the year and know what places you should visit and what local events are happening.</span><br><br>
+					
+					<span><strong>Technical Overview:</strong><br> This project uses flickr to obtain hundreds of thousands of picture locations. Each picture has a latitude, longitude, and date in which it was taken. A local python script uses the flickr api to create JSON files of picture locations. The user specifies a month of a given year and then what city they want displayed. The corresponding JSON file is read and the locations are mapped using the google maps api. A heatmap layer is then applied to the map so it's easier to see where the most activity is.</span>
+
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+
+		<div id="googleMap" style="width:100%;height:80%;"></div>
+
+	<!--<label for="placeToFind">Enter a place on the map to be populated by photo geolocations:</label>
+	<input type="text" placeholder="continent, country, region, locality, or neighborhood" class="form-control" id="placeToFind">
+	<label for="numberOfHits">Specify number of hits to display:</label>
+	<input type="number" min="0" placeholder="Default 250" class="form-control" id="numberOfHits">
+-->
+
+<b style="float:right" id="numDisplayed"></b>
+<b style="float:right">Number of geolocations displayed:</b>
+
+<center>
+	<button class="btn btn-danger" id="markerToggle" onclick="toggleMarkers()">Toggle Markers</button>
+	<button class="btn btn-danger" id="heatmapToggle" onclick="toggleHeatmap()">Toggle Heatmap</button>
+	<button class="btn btn-danger" id="changeGradient" onclick="changeGradient()">Change Gradient</button>
+
+<!--
+	<button class="btn btn-danger" id="changeRadius" onclick="changeRadius()">Change Radius</button>
+	<button class="btn btn-danger" id="changeOpacity" onclick="changeOpacity()">Change Opacity</button>
+	<button class="btn btn-danger" id="changeIntensity" onclick="changeIntensity()">Change Intensity</button>
+-->
+<p id="retStatement"></p>
+
+</center>
+
+
+<div class="container">
+	<div class="row col-sm-12">
+		<!--Month Dropdown-->
+		<div class="dropup col-sm-3" style="text-align:center;padding:2px">
+			<button id="month" class="btn btn-primary btn-lg btn-block dropdown-toggle" type="button" data-toggle="dropdown">Month
+				<span class="caret"></span></button>
+				<ul class="dropdown-menu dropdown-menu-right">
+					<li><a href="javascript:void(0);" onclick="filterClick('#month', $(this).text() )">January</a></li>
+					<li><a href="javascript:void(0);" onclick="filterClick('#month', $(this).text() )">February</a></li>
+					<li><a href="javascript:void(0);" onclick="filterClick('#month', $(this).text() )">March</a></li>
+					<li><a href="javascript:void(0);" onclick="filterClick('#month', $(this).text() )">April</a></li>
+					<li><a href="javascript:void(0);" onclick="filterClick('#month', $(this).text() )">May</a></li>
+					<li><a href="javascript:void(0);" onclick="filterClick('#month', $(this).text() )">June</a></li>
+					<li><a href="javascript:void(0);" onclick="filterClick('#month', $(this).text() )">July</a></li>
+					<li><a href="javascript:void(0);" onclick="filterClick('#month', $(this).text() )">August</a></li>
+					<li><a href="javascript:void(0);" onclick="filterClick('#month', $(this).text() )">September</a></li>
+					<li><a href="javascript:void(0);" onclick="filterClick('#month', $(this).text() )">October</a></li>
+					<li><a href="javascript:void(0);" onclick="filterClick('#month', $(this).text() )">November</a></li>
+					<li><a href="javascript:void(0);" onclick="filterClick('#month', $(this).text() )">December</a></li>
+				</ul>
+			</div>
+
+			<!--Year Dropdown-->
+			<div class="dropup col-sm-3" style="text-align:center;padding:2px">
+				<button id="year" class="btn btn-primary btn-lg btn-block dropdown-toggle" type="button" data-toggle="dropdown">Year
+					<span class="caret">
+						
+					</span>
+				</button>
+				<ul class="dropdown-menu">
+					<li><a href="javascript:void(0);" onclick="filterClick('#year', $(this).text() )">2015</a></li>
+					<li><a href="javascript:void(0);" onclick="filterClick('#year', $(this).text() )">2014</a></li>
+					<!--<li><a href="javascript:void(0);" onclick="filterClick('#year', $(this).text() )">2013</a></li>
+					<li><a href="javascript:void(0);" onclick="filterClick('#year', $(this).text() )">2012</a></li>
+					<li><a href="javascript:void(0);" onclick="filterClick('#year', $(this).text() )">2011</a></li>
+					<li><a href="javascript:void(0);" onclick="filterClick('#year', $(this).text() )">2010</a></li>-->
+				</ul>
+			</div>
+
+			<!--Place Dropdown-->
+			<div class="dropup col-sm-3" style="text-align:center;padding:2px">
+				<button id="place" class="btn btn-primary btn-lg btn-block dropdown-toggle" type="button" data-toggle="dropdown">Place
+					<span class="caret"></span>
+				</button>
+				<ul id="placeFiles" class="dropdown-menu"></ul>
+			</div>
+
+			<div class="col-sm-3" style="padding:2px">
+				<center>
+					<button id="displayBtn" class="btn btn-warning btn-lg btn-block" type="button" onclick="readJSONFiles()">Display Locations</button>
+				</center>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+
+<div class="container">
+	<div class="well col-sm-12">
+		<div class="col-sm-4">
+			<strong>Intensity:</strong>
+			<strong id="intensityVal">10</strong>
+			<input id="intensityRange" type="range" min="1" max="100" value="10" onchange="changeIntensity()">
+		</div>
+
+		<div class="col-sm-4">
+			<strong>Radius:</strong>
+			<strong id="radiusVal">10</strong>
+			<input id="radiusRange" type="range" min="1" max="30" value="10" onchange="changeRadius()">
+		</div>
+
+		<div class="col-sm-4">
+			<strong>Opacity</strong>
+			<strong id="opacityVal">1</strong>
+			<input id="opacityRange" step="0.1" type="range" min="0" max="1" value="1" onchange="changeOpacity()">
+		</div>
+	</div>
+</div>
+
+<!--<p id="filesReturned"></p>-->
+<p id="filesReturned" style="display:none"></p> 
+
+
+</body>  
+</html>  
