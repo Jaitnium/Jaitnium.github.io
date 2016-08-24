@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link href="https://fonts.googleapis.com/css?family=Bree+Serif" rel="stylesheet">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+	<style>
+
+		body {
+			font-family: "Bree Serif";
+		}
+
+		.dogDisplay {
+			display: inline-block;
+			border-radius: 30px;
+			border-width: 2px;
+			width: 300px;
+			/*height: 500px; */
+			height: auto;
+			margin: 10px;
+			box-shadow: 10px 10px 5px rgb(105, 105, 105);
+
+			/*padding: 5px;
+			/*overflow: hidden;*/
+		}
+
+		.dogName {
+			font-size: 20px;
+			text-align: center;
+			margin: 5px;
+		}
+
+		.dogImg {
+			width: auto;
+			height: auto;
+			border-radius: 10px;
+			display: block;
+			margin-bottom: 10px;
+
+		}
+
+		.starImg {
+			width: 25px;
+			height: 25px;
+			font-size: 0px;
+		}
+
+
+		.stats {
+			padding: 5px;
+		}
+
+		.stat {
+			position: relative;
+			text-align: right;
+			right: 25px;
+			font-size: 15px;
+		}
+
+		.panel-heading {
+			margin: 0px;
+			border-bottom-right-radius: 20px;
+			border-bottom-left-radius: 20px;
+		}
+
+
+	</style>
+
+</head>
+
+<script>
+
+	var dogInfo = [];
+
+    //Given a number between 1-5
+    //Return the html for the specified number of gold stars, and the rest as empty stars
+    function getStars(num) {
+    	if(num == 1) {
+    		return '<img class="starImg" src="images/gold-star.png" alt="gold star">' +
+    		'<img class="starImg" src="images/no-star.png" alt="no star">' +
+    		'<img class="starImg" src="images/no-star.png" alt="no star">' +
+    		'<img class="starImg" src="images/no-star.png" alt="no star">' +
+    		'<img class="starImg" src="images/no-star.png" alt="no star">'
+    	}
+    	if(num == 2) {
+    		return '<img class="starImg" src="images/gold-star.png" alt="gold star">' +
+    		'<img class="starImg" src="images/gold-star.png" alt="gold star">' +
+    		'<img class="starImg" src="images/no-star.png" alt="no star">' +
+    		'<img class="starImg" src="images/no-star.png" alt="no star">' +
+    		'<img class="starImg" src="images/no-star.png" alt="no star">'
+    	}
+    	if(num == 3) {
+    		return '<img class="starImg" src="images/gold-star.png" alt="gold star">' +
+    		'<img class="starImg" src="images/gold-star.png" alt="gold star">' +
+    		'<img class="starImg" src="images/gold-star.png" alt="gold star">' +
+    		'<img class="starImg" src="images/no-star.png" alt="no star">' +
+    		'<img class="starImg" src="images/no-star.png" alt="no star">'
+    	}
+    	if(num == 4) {
+    		return '<img class="starImg" src="images/gold-star.png" alt="gold star">' +
+    		'<img class="starImg" src="images/gold-star.png" alt="gold star">' +
+    		'<img class="starImg" src="images/gold-star.png" alt="gold star">' +
+    		'<img class="starImg" src="images/gold-star.png" alt="gold star">' +
+    		'<img class="starImg" src="images/no-star.png" alt="no star">'
+    	}
+    	if(num == 5) {
+    		return '<img class="starImg" src="images/gold-star.png" alt="gold star">' +
+    		'<img class="starImg" src="images/gold-star.png" alt="gold star">' +
+    		'<img class="starImg" src="images/gold-star.png" alt="gold star">' +
+    		'<img class="starImg" src="images/gold-star.png" alt="gold star">' +
+    		'<img class="starImg" src="images/gold-star.png" alt="gold star">'
+    	}
+    }
+
+    function displayInfo(dogBreeds) {
+    	var i;
+    	for(i = 0; i < dogBreeds.length; i++) {
+    		var dog = dogBreeds[i];
+    		var info = 
+    		'<div class="dogDisplay panel panel-primary">' +
+    		'<div class="panel-content">' +
+    		'<p class="dogName">' + dog.breedName + '</p>' +
+    		'<a href=' + dog.link + '><img class="dogImg img-thumbnail" src=' + dog.imgLink + ' alt="Place-holder"></a>' +
+    		'</div>' +
+    		'<div class="stats panel-heading">' +
+    		'<div class="stat">' +
+    		'<p data-toggle="tooltip" title="More stars means this breed will be easier to train.">Intelligence: ' +
+    		'<span style="display:none">' + dog.intelligence + '</span>' +
+    		getStars(dog.intelligence) +
+    		'</p>' +
+    		'</div>' +
+    		'<div class="stat">' +
+    		'<p data-toggle="tooltip" title="Less stars indicates this breed will shed less.">Shedding: ' +
+    		'<span style="display:none">' + dog.shedding + '</span>' +				
+    		getStars(dog.shedding) +
+    		'</p>' +
+    		'</div>' +
+    		'<div class="stat">' +
+    		'<p data-toggle="tooltip" title="A high energy dog will require more walks and more attention.">Energy: ' +
+    		'<span style="display:none">' + dog.energy+ '</span>' +				
+    		getStars(dog.energy) +
+    		'</p>' +
+    		'</div>' +
+    		'<div class="stat">' +
+    		'<p data-toggle="tooltip" title="A larger dog will require more food and space to run around.">Size: ' +
+    		'<span style="display:none">' + dog.size + '</span>' +								       
+    		getStars(dog.size) +
+    		'</p>' +
+    		'</div>' +
+    		'</div>' +
+    		'</div>';
+
+    		$("#container").append(info);
+    	}
+    	console.log(dog.breedName);
+    }
+
+    window.onload = function() {
+		/*var obj = JSON.parse(breeds);
+		document.getElementById("p1").innerHTML = obj.dogBreeds[0].breedName;
+		*/
+		$.getJSON("breeds.json", function(json) {
+			//console.log(json);
+			var i;
+			console.log("hi");
+			console.log(typeof(json.dogBreeds));
+			/*for(i = 0; i < json.dogBreeds.length; i++) {
+				console.log(i);
+				console.log(json.dogBreeds[i]);
+			}*/
+			dogInfo = json.dogBreeds;
+
+			displayInfo(json.dogBreeds);
+			addToolTips();
+
+		})
+	}
+
+	function addToolTips() {
+
+        //Enable the tool tips for each stat field
+        $("p").each(function(index, element) {
+        	$(this).tooltip();
+        })
+
+        //Add the tool tips for the filter questions
+        $(".glyphicon-info-sign").each(function(index, element) {
+        	$(this).tooltip();
+        })
+
+    }
+
+
+    /*Helper function for converting intelligence string to value
+    when given a string, return the number value*/
+    function intToVal(text) {
+    	if(text == "Any Level") {
+    		return 0;
+    	}
+    	if(text == "Very intelligent") {
+    		return 5;
+    	}
+    	if(text == "Pretty smart") {
+    		return 4;
+    	}
+    	if(text == "Average") {
+    		return 3;
+    	}
+    	if(text == "Below average") {
+    		return 2;
+    	}
+    	if(text == "A little slow") {
+    		return 1;
+    	}
+    	else {
+    		console.log("ERROR in 'intToVal': given text " + text + " which doesn't match any option");
+    		return -1;
+    	}
+    }
+
+
+    /*Helper function for converting shed string to value
+    when given a string, return the number value*/
+    function shedToVal(text) {
+    	if(text == "Any Amount") {
+    		return 0;
+    	}
+    	if(text == "Let there be fur!") {
+    		return 5;
+    	}
+    	if(text == "Quite a bit") {
+    		return 4;
+    	}
+    	if(text == "Average") {
+    		return 3;
+    	}
+    	if(text == "Barely any") {
+    		return 2;
+    	}
+    	if(text == "Very little to none") {
+    		return 1;
+    	}
+    	else {
+    		console.log("ERROR in 'shedToVal': given text " + text + " which doesn't match any option");
+    		return -1;
+    	}
+    }
+
+    /*Helper function for converting energy string to value
+    when given a string, return the number value*/
+    function energyToVal(text) {
+    	if(text == "Any Level") {
+    		return 0;
+    	}
+    	if(text == "Tons of energy") {
+    		return 5;
+    	}
+    	if(text == "Quite a lot") {
+    		return 4;
+    	}
+    	if(text == "A decent amount") {
+    		return 3;
+    	}
+    	if(text == "Some energy") {
+    		return 2;
+    	}
+    	if(text == '"Couch Potato"') {
+    		return 1;
+    	}
+    	else {
+    		console.log("ERROR in 'energyToVal': given text " + text + " which doesn't match any option");
+    		return -1;
+    	}
+    }
+
+    /*Helper function for converting size string to value
+    when given a string, return the number value*/
+    function sizeToVal(text) {
+    	if(text == "Any Size") {
+    		return 0;
+    	}
+    	if(text == "Horse-sized") {
+    		return 5;
+    	}
+    	if(text == "Big") {
+    		return 4;
+    	}
+    	if(text == "Average-sized") {
+    		return 3;
+    	}
+    	if(text == "Pretty small") {
+    		return 2;
+    	}
+    	if(text == "Almost a cat") {
+    		return 1;
+    	}
+    	else {
+    		console.log("ERROR in 'energyToVal': given text " + text + " which doesn't match any option");
+    		return -1;
+    	}
+    }
+
+    /*
+       This boolean array is as long as the amount of dog breeds.
+
+       Each filter will go through the breeds and mark the corresponding index to FALSE depending
+       on whether it matches the filter's criteria. Once a cell is marked FALSE, subsequent filters can't
+       set the cell to TRUE (otherwise it would be undoing the previous filter's work). After each filter
+       is applied, the dog breeds to each corresponding TRUE index will be set visible, while everything
+       else will be set invisible.
+
+       This method is used to avoid one filter from fadingIn a dog breed that another filter
+       will fadeOut, causing unneeded and confusing animations. Another solution could be having a long
+       "if" statement, but that would be difficult to read and debug.
+       */
+       var dogFilter = [];
+
+       /*Applies a filter for all four fields*/
+       function filter() {
+
+       	var i;
+
+       	/*Set all dogFilter cells to TRUE*/
+       	for(i = 0; i < dogInfo.length; i++) {
+       		dogFilter[i] = true;
+       	}
+
+       	var intAmount = intToVal($("#intOpt").text());
+    	//alert(intAmount);
+    	/*Hide any breeds with less than the level of intelligence specified
+    	And show the breeds that are AT LEAST as smart as the specified amount*/
+    	filterInt(intAmount);
+
+    	var shedAmount = shedToVal($("#shedOpt").text());
+    	//alert(shedAmount);
+    	/*Hide any breeds with a higher level of shedding than the specified threshold
+    	Don't make any breeds visible, because it'll undo the work that filterInt did*/
+    	filterShedding(shedAmount);
+
+    	var energyAmount = energyToVal($("#energyOpt").text());
+    	//alert(energyAmount);
+    	filterEnergy(energyAmount);
+
+    	var sizeAmount = sizeToVal($("#sizeOpt").text());
+    	//alert(sizeAmount);
+    	filterSize(sizeAmount);
+
+    	//$(".dogDisplay").eq(1).fadeOut();
+    	/*Apply dog filter*/
+    	for(i = 0; i < dogFilter.length; i++) {
+    		//If the breed should be shown
+    		if(dogFilter[i] == true) {
+    			//and is invisible
+    			if ($(".dogDisplay").eq(i).is(":visible") == false) {
+    				//make visible
+    				$(".dogDisplay").eq(i).fadeIn();
+    			}
+    		}
+    		//Else if the dog breed shouldn't be shown
+    		else if(dogFilter[i] == false) {
+    			//and is visible
+    			if ($(".dogDisplay").eq(i).is(":visible")) {
+    				//make invisible
+    				$(".dogDisplay").eq(i).fadeOut();
+    			}
+    		}
+    	}
+    }
+
+    /*Given a number that is 0-5, with 0 being "Any Level"
+    Hide all dogDisplays with LESS than the desiredAmount
+    AKA: only dogs with AT LEAST the desiredAmount will be shown*/
+    function filterInt(desiredAmount) {
+    	/*For each dog display*/
+    	$(".dogDisplay").each(function(index, element) {
+    		/*access the stats and put them into an array*/
+    		var statArray = $(this).find("p span").text()
+    		/*The first element in the array is the intelligence*/
+    		//If this breed isn't AT LEAST as smart as the desired amount AND an amount WAS specified
+    		if(statArray[0] < desiredAmount && desiredAmount != 0) {
+    			dogFilter[index] = false;
+    		}
+
+    		/*The first element in the array is the intelligence*/
+    		//If this breed is AT LEAST as smart as the desired amount, or no amount was specified
+    		/*if(statArray[0] >= desiredAmount || desiredAmount == 0) {
+    			//If invisible, fadeIn
+    			if( $(element).is(":visible") == false ) {
+    				$(this).fadeIn();
+
+    			}
+    			//Else it's already visible, so don't do anything
+    		}
+    		//If this breed's intelligence isn't within the threshold
+    		else {
+    			//If visible, fadeOut
+    			if( $(element).is(":visible") ) {
+    				$(this).fadeOut();
+    			}
+    			//Else it's already invisible, so don't do anything
+    		}*/
+    	});
+    }
+
+    /*Given a number that is 0-5, with 0 being "Any Amount"
+    Hide all dogDisplays with more than the desiredAmount
+    AKA: only dogs UP TO the desiredAmount will be shown*/
+    function filterShedding(desiredAmount) {
+    	
+    	/*For each dog display*/
+    	$(".dogDisplay").each(function(index, element) {
+    		/*access the stats and put them into an array*/
+    		var statArray = $(this).find("p span").text()
+    		/*The second element in the array is the shedding*/
+    		//If this breed's shedding is higher than the tolerable amount AND an amount was specified
+    		if(statArray[1] > desiredAmount && desiredAmount != 0) {
+    			/*//If visible, fadeOut
+    			if( $(element).is(":visible") ) {
+    				$(this).fadeOut();
+    			}
+    			//Else it's already invisible, so don't do anything*/
+    			dogFilter[index] = false;
+    		}
+    	});
+    }
+
+    /*Given a number that is 0-5, with 0 being "Any Level"
+    Hide all dogDisplays whose breed doesn't equal the specified amount*/
+    function filterEnergy(desiredAmount) {
+    	/*For each dog display*/
+    	$(".dogDisplay").each(function(index, element) {
+    		/*access the stats and put them into an array*/
+    		var statArray = $(this).find("p span").text()
+    		/*The third element in the array is the energy*/
+    		//If this breed's energy isn't equal to the desired amount AND an amount was specified
+    		if(statArray[2] > desiredAmount && desiredAmount != 0) {
+    			dogFilter[index] = false;
+    		}
+    	});
+    }
+
+    /*Given a number that is 0-5, with 0 being "Any Level"
+    Hide all dogDisplays whose breed doesn't equal the specified amount*/
+    function filterSize(desiredAmount) {
+    	/*For each dog display*/
+    	$(".dogDisplay").each(function(index, element) {
+    		/*access the stats and put them into an array*/
+    		var statArray = $(this).find("p span").text()
+    		/*The fourth element in the array is the size*/
+    		//If this breed's energy isn't equal to the desired amount AND an amount was specified
+    		if(statArray[3] != desiredAmount && desiredAmount != 0) {
+    			dogFilter[index] = false;
+    		}
+    	});
+    }
+
+
+    //Called when a drop-down option is selected
+    function optionClick(btnID, newText) {
+    	//Change the text of the given dropdown button to the selected option
+    	$(btnID).text(newText);
+
+    	//and then filter the dog breeds
+    	filter();
+    }
+
+</script>
+
+<body>
+
+	<!--Navigation Bar-->
+	<nav class="navbar navbar-static-top navbar-default" style="text-align:center;background-color:rgb(255,255,255);margin:0px">
+		<div class="container-fluid">
+			<ul class="nav navbar-nav" style="text-align:center;display:inline-block;float:none">
+				<li><a href="../index.html">Home</a></li>
+				<li class="dropdown">
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#">My Projects
+						<span class="caret"></span>
+					</a>
+					<ul class="dropdown-menu">
+						<li><a href="../globalTimezones/globalTimezones.html">Global Timezones</a></li>
+						<li><a href="#">Dog Breed Finder</a></li>
+						<li><a href="../popularLocationsDemo/flickrTest.html">Popular Locations Tech Demo</a></li>
+					</ul>
+				</li>
+				<li data-toggle="modal" data-target="#contactModal"><a href="#">Contact</a></li>
+				<li><a href="../Matthew_Antosiak.pdf">Resume</a></li>
+			</ul>
+			<ul class="nav navbar-nav navbar-right">
+				<li data-toggle="modal" data-target="#aboutModal"><a href="#">About</a></li>
+			</ul>
+		</div>
+	</nav>
+	<!--About Modal-->
+	<div id="aboutModal" class="modal fade" fole="dialog">
+		<div class="modal-dialog modal-lg">
+			<!--Modal Content-->
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">About</h4>
+				</div>
+				<div class="modal-body">
+					<span> <strong>About this project:</strong><br>
+					I was inspired to do this project after using many websites when I was researching for my own dog. Each dog breed website would ask dozens of questions with limited options and you'd often have little to no results once you reached the end of the survey. With my layout you can see which breeds are available after each question is answered and the important information is clearly displayed. Additionally, information about a breed can be found by clicking on a breed's picture.</span><br><br>
+					
+					<span> <strong>Technical Overview:</strong><br>There are two parts to this webpage: <strong>getting</strong> and then <strong>displaying</strong> infomation.<br> A python script is locally run to parse
+					data from dogtime.com into a JSON file using the Beautiful Soup library. My webpage then interprets the JSON file and displays each dog breed's information accordingly.
+
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+		</div>
+	</div>
+		<!--Contact Modal-->
+		<div id="contactModal" class="modal fade" fole="dialog">
+			<div class="modal-dialog modal-sm">
+				<!--Modal Content-->
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Contact</h4>
+					</div>
+					<div class="modal-body">
+						<span><strong>Cell Phone:</strong>  650-380-6982 </span><br>
+						<span><strong>Email:</strong> matthewaantosiak@gmail.com</span>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!--Question Filter-->
+		<div class="well">
+			<div class="container-fluid" style="text-align:center">
+				<h3>Please answer the questions below to find your ideal dog breed.</h3>
+				<br>
+			</div>
+
+			<div class="container">
+				<div>
+					<div class="row">
+						<div class="col-sm-6">
+							<center>
+								<p class="col-sm-6">What is the minimum intelligence the breed must be? 
+								</p>
+
+								<div class="btn-group col-sm-6">
+									<button  class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+										<span id="intOpt">Any Level</span>
+										<span class="caret"></span>
+										<span class="glyphicon glyphicon-info-sign" data-container="body" data-toggle="tooltip" title="All breeds with less than selected amount will be filtered out."></span>         
+
+									</button>
+
+									<ul class="dropdown-menu">
+										<li><a href="javascript:void(0);" onclick="optionClick('#intOpt', $(this).text())">Any Level</a></li>
+										<li><a href="javascript:void(0);" onclick="optionClick('#intOpt', $(this).text())">Very intelligent</a></li>
+										<li><a href="javascript:void(0);" onclick="optionClick('#intOpt', $(this).text())">Pretty smart</a></li>
+										<li><a href="javascript:void(0);" onclick="optionClick('#intOpt', $(this).text())">Average</a></li>
+										<li><a href="javascript:void(0);" onclick="optionClick('#intOpt', $(this).text())">Below average</a></li>
+										<li><a href="javascript:void(0);" onclick="optionClick('#intOpt', $(this).text())">A little slow</a></li>
+									</ul>
+								</div>
+							</center>
+						</div>
+
+						<div class="col-sm-6">
+							<center>
+								<p class="col-sm-6">How much shedding are you willing to put up with? 
+								</p>
+								<div class="btn-group col-sm-6">
+									<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+										<span id="shedOpt">Any Amount</span>
+										<span class="caret"></span>
+										<span class="glyphicon glyphicon-info-sign" data-container="body" data-toggle="tooltip" title="Only breeds that shed up to the amount specified will be shown."></span>         
+									</button>
+
+									<ul class="dropdown-menu">
+										<li><a href="javascript:void(0);" onclick="optionClick('#shedOpt', $(this).text())">Any Amount</a></li>
+										<li><a href="javascript:void(0);" onclick="optionClick('#shedOpt', $(this).text())">Let there be fur!</a></li>
+										<li><a href="javascript:void(0);" onclick="optionClick('#shedOpt', $(this).text())">Quite a bit</a></li>
+										<li><a href="javascript:void(0);" onclick="optionClick('#shedOpt', $(this).text())">Average</a></li>
+										<li><a href="javascript:void(0);" onclick="optionClick('#shedOpt', $(this).text())">Barely any</a></li>
+										<li><a href="javascript:void(0);" onclick="optionClick('#shedOpt', $(this).text())">Very little to none</a></li>
+									</ul>
+								</div>
+							</center>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-sm-6">
+							<center>
+								<p class="col-sm-6">What is the maximum amount of energy you want your breed to have? 
+								</p>
+								<div class="btn-group col-sm-6">
+									<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+										<span id="energyOpt">Any Level</span>
+										<span class="caret"></span>
+										<span class="glyphicon glyphicon-info-sign" data-container="body" data-toggle="tooltip" title="Only breeds with equal to or less than this amount will be shown."></span>         
+									</button>
+
+									<ul class="dropdown-menu">
+										<li><a href="javascript:void(0);" onclick="optionClick('#energyOpt', $(this).text())">Any Level</a></li>
+										<li><a href="javascript:void(0);" onclick="optionClick('#energyOpt', $(this).text())">Tons of energy</a></li>
+										<li><a href="javascript:void(0);" onclick="optionClick('#energyOpt', $(this).text())">Quite a lot</a></li>
+										<li><a href="javascript:void(0);" onclick="optionClick('#energyOpt', $(this).text())">A decent amount</a></li>
+										<li><a href="javascript:void(0);" onclick="optionClick('#energyOpt', $(this).text())">Some energy</a></li>
+										<li><a href="javascript:void(0);" onclick="optionClick('#energyOpt', $(this).text())">"Couch Potato"</a></li>
+									</ul>
+								</div>
+							</center>
+						</div>
+
+						<div class="col-sm-6">
+							<center>
+								<p class="col-sm-6">How big do you want your dog to be? 
+								</p>
+
+								<div class="btn-group col-sm-6">
+									<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+										<span id="sizeOpt">Any Size</span>
+										<span class="caret"></span>
+										<span class="glyphicon glyphicon-info-sign" data-container="body" data-toggle="tooltip" title="Only breeds that are exactly this size will be shown."></span>
+
+									</button>
+
+									<ul class="dropdown-menu">
+										<li><a href="javascript:void(0);" onclick="optionClick('#sizeOpt', $(this).text())">Any Size</a></li>
+										<li><a href="javascript:void(0);" onclick="optionClick('#sizeOpt', $(this).text())">Horse-sized</a></li>
+										<li><a href="javascript:void(0);" onclick="optionClick('#sizeOpt', $(this).text())">Big</a></li>
+										<li><a href="javascript:void(0);" onclick="optionClick('#sizeOpt', $(this).text())">Average-sized</a></li>
+										<li><a href="javascript:void(0);" onclick="optionClick('#sizeOpt', $(this).text())">Pretty small</a></li>
+										<li><a href="javascript:void(0);" onclick="optionClick('#sizeOpt', $(this).text())">Almost a cat</a></li>
+									</ul>
+								</div>
+							</center>
+						</div>
+					</div>
+
+                <!--
+                <div class="row col-sm-12" style="padding:10px">
+                    <center>
+                        <btn class="btn btn-lg btn-primary" onclick="filter()">Filter Dog Breeds</btn>
+                    </center>
+                </div>-->
+            </div>
+        </div>
+    </div>
+
+    <!--Where the dog breeds will be displayed-->
+    <div id="container" class="container" style="width:100%;background-color:lightblue;border:black 2px solid;text-align:center;">
+
+        <!--Sample Dog
+        <div class="dogDisplay panel panel-primary">
+            <div class="panel-content">
+                <p class="dogName">Dog Name</p>
+                <img class="dogImg img-thumbnail" src="images/place-holder.jpg" alt="Place-holder">
+            </div>
+
+            <div class="stats panel-heading">
+            <div class="stat">
+             <p data-toggle="tooltip" title="PH">Intelligence:
+                 <span style="display:none">5</span>
+                 <img class="starImg" src="images/gold-star.png" alt="gold star">
+                 <img class="starImg" src="images/gold-star.png" alt="gold star">
+                 <img class="starImg" src="images/gold-star.png" alt="gold star">
+                 <img class="starImg" src="images/gold-star.png" alt="gold star">
+                 <img class="starImg" src="images/gold-star.png" alt="gold star">
+             </p>
+            </div>
+            <div class="stat">
+                <p data-toggle="tooltip" title="PH">Shedding:
+                <span style="display:none">5</span>
+                <img class="starImg" src="images/gold-star.png" alt="gold star">
+                <img class="starImg" src="images/gold-star.png" alt="gold star">
+                 <img class="starImg" src="images/gold-star.png" alt="gold star">
+                 <img class="starImg" src="images/gold-star.png" alt="gold star">
+                 <img class="starImg" src="images/gold-star.png" alt="gold star">
+                </p>  
+            </div>
+            <div class="stat">
+                <p data-toggle="tooltip" title="PH">Energy:
+                <span style="display:none">5</span>
+                 <img class="starImg" src="images/gold-star.png" alt="gold star">
+                <img class="starImg" src="images/gold-star.png" alt="gold star">
+                <img class="starImg" src="images/gold-star.png" alt="gold star">
+                <img class="starImg" src="images/gold-star.png" alt="gold star">
+                <img class="starImg" src="images/gold-star.png" alt="gold star">
+                </p>
+            </div>
+            <div class="stat">
+                <p data-toggle="tooltip" title="PH">Size:
+                <span style="display:none">5</span>
+                <img class="starImg" src="images/gold-star.png" alt="gold star">
+                <img class="starImg" src="images/gold-star.png" alt="gold star">
+                <img class="starImg" src="images/gold-star.png" alt="gold star">
+                <img class="starImg" src="images/gold-star.png" alt="gold star">
+                <img class="starImg" src="images/gold-star.png" alt="gold star">
+                </p>
+            </div>
+            </div>
+        </div> -->
+
+    </div>
+
+</body>
+
+</html>
