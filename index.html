@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<link href="https://fonts.googleapis.com/css?family=Bree+Serif" rel="stylesheet">
+
+</head>
+
+<style>
+
+	body {
+		font-family: "Bree Serif";
+	}
+
+	.navbar .navbar-nav {
+		display: inline-block;
+		float: none;
+	}
+	.navbar .navbar-collapse {
+		text-align: center;
+	}
+
+	#container {
+		background-size: auto;
+		background-repeat: no-repeat;
+		background-image: url("Utah9.jpg");
+		background-position: 50% 50%;
+		padding:250px;
+	}
+
+	#about1, #about2, #about3, #about4 {
+		display:none;
+		font-size: 25px;
+		color: rgb(255,255,255);
+		font-family: "Bree Serif";
+		position: relative;
+		left: -300px;
+	}
+
+</style>
+
+<script>
+	$(document).ready(function() {
+	/*	$("#about2").show(1000).animate({left: '0px'}, function() {
+			$("#about3").show(1000).animate({left: '0px'}, function() {
+				$("#about4").show(1000).animate({left: '0px'});
+			});
+		});*/
+		showDuration = 1000;
+		slideDuration = 1000;
+
+		$("#about2").show({
+			duration: showDuration,
+			queue: false,
+			complete: function() { 
+			/* Animation complete */ }
+		});
+
+		$("#about2").animate({
+			left: '0px'
+		}, {
+			duration: slideDuration,
+			queue: false,
+			complete: function() { 
+				$("#about3").show({
+					duration: showDuration,
+					queue: false,
+					complete: function() { 
+					/* Animation complete */ }
+				});
+
+				$("#about3").animate({
+					left: '0px'
+				}, {
+					duration: slideDuration,
+					queue: false,
+					complete: function() { 
+						$("#about4").show({
+							duration: showDuration,
+							queue: false,
+							complete: function() { 
+							/* Animation complete */ }
+						});
+
+						$("#about4").animate({
+							left: '0px'
+						}, {
+							duration: slideDuration,
+							queue: false,
+							complete: function() { 
+							/* Animation complete */ }
+						});
+					}
+				});
+			}
+		});
+
+		//$("#about4").show(3000).animate({left: '0px'});
+	});
+</script>
+
+<body>
+
+	<!--Navigation Bar-->
+	<nav class="navbar navbar-static-top navbar-default" style="text-align:center;background-color:rgb(255,255,255);margin:0px">
+		<div class="container-fluid">
+			<ul class="nav navbar-nav">
+				<li><a href="#">Home</a></li>
+				<li class="dropdown">
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#">My Projects
+						<span class="caret"></span>
+					</a>
+					<ul class="dropdown-menu">
+						<li><a href="globalTimezones/globalTimezones.html">Global Timezones</a></li>
+						<li><a href="dogBreedFinder/dogBreedFinder.html">Dog Breed Finder</a></li>
+						<li><a href="popularLocationsDemo/flickrTest.html">Popular Locations Tech Demo</a></li>
+					</ul>
+				</li>
+				<li data-toggle="modal" data-target="#contactModal"><a href="#">Contact</a></li>
+				<li><a href="Matthew_Antosiak.pdf">Resume</a></li>
+			</ul>
+		</div>
+	</nav>
+	<!--Contact Modal-->
+	<div id="contactModal" class="modal fade" fole="dialog">
+		<div class="modal-dialog modal-sm">
+			<!--Modal Content-->
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">Contact</h4>
+				</div>
+				<div class="modal-body">
+					<span><strong>Cell Phone:</strong>  650-380-6982 </span><br>
+					<span><strong>Email:</strong> matthewaantosiak@gmail.com</span>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!--Display page-->
+	<div id="container" class="container-fluid">
+		<div class="col-sm-12">
+			<center>
+				<p id="about1" style="font-size:80px;display:unset;left: 0px;">Matthew Antosiak</p>
+				<p id="about2">B.S. Computer Science</p>
+				<p id="about3">2016 Cal Poly Graduate</p>
+				<p id="about4">Front End Engineer</p>
+			</center>
+		</div>
+	</div>
+
+</body>
+</html>
