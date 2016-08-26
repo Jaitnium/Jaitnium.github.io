@@ -377,7 +377,7 @@
 			console.log("setPlaceDropdown Start..")
 			//Check for existence of mapData directory
 			$.ajax({
-				url:'https://jaitnium.github.io/mapData/',
+				url:'//mapData',
 				error: function() {
 					//Data points directory doesn't exist
 					console.log("ERROR: expected directory named 'mapData'. Exiting...");
@@ -768,9 +768,22 @@
 
 		google.maps.event.addDomListener(window, 'load', initialize);
 
+
+		function myTest() {
+			//var selectedFile = document.getElementById('mapDataDir');
+			//console.log(selectedFile).val();
+			var myfolder = Folder("./mapData");
+			if(myfolder.exists) {
+				alert("IT WORKS");
+			}
+		}
+
 	</script>
 </head>  
 <body>  
+
+    <input type="mapData" id="mapDataDir" display="hidden" value="mapData" webkitdirectory directory multiple/>
+	<button class="btn btn-danger" id="myTest" onclick="myTest()">Test</button>
 
 	<!--Navigation Bar-->
 	<nav class="navbar navbar-static-top navbar-default" style="text-align:center;background-color:rgb(255,255,255);margin:0px">
