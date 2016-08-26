@@ -375,10 +375,12 @@
 			month = $('#month').text();
 
 			console.log("new test");
-			
+
 									//At this point we know the directory exists
 									//Get everything at subdirectory
-									$.get("mapData/" + year + "/" + month +"/.", function(data) {
+								    $.get("//mapData/.", function(data) {
+
+									//$.get("mapData/" + year + "/" + month +"/.", function(data) {
 
 										//console.log(data);
 										//Set filesRet to show files at subdirectory
