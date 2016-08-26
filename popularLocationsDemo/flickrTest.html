@@ -374,6 +374,35 @@
 			year = $('#year').text();
 			month = $('#month').text();
 
+			console.log("new test");
+
+												//Get everything at subdirectory
+		    $.get("mapData/" + year + "/" + month +"/.", function(data) {
+
+										//console.log(data);
+										//Set filesRet to show files at subdirectory
+										//Try to load the data into filesReturned
+										try {
+											$("#filesReturned").html(data);
+											$("#filesReturned").find('a:contains(".json")').each(function () {
+												//console.log("First try: " + this.href.replace("http:///", "").split("/"))
+
+												var array = this.href.replace(window.location.host, "").replace("http:///", "").split("/");
+                                            	//The last array element wil be the fileName
+                                            	var fileName = array[array.length-1];
+                                            	console.log("Filename: " + array[array.length-1]);
+                                            	var fullPath = "mapData/" + year + "/" + month + "/" + fileName;
+                                            	console.log("FullPath: " + fullPath);
+
+												//Now parse the place from the filename and add that option to the placeDropdown
+												array = fileName.split("_");
+												var place = array[0];
+												console.log("Place: " + place);
+												$("#placeFiles").append("<li><a href='javascript:void(0);' onclick='$(&#34;#place&#34;).text($(this).text())'>" + place + "</a></li>")
+											});
+										}
+
+
 			console.log("setPlaceDropdown Start..")
 			//Check for existence of mapData directory
 			$.ajax({
@@ -553,8 +582,13 @@
 			year = $('#year').text();
 			month = $('#month').text();
 			place = $('#place').text();
+			fileName = place + "_" + month + "_" + year + ".json"
+			//Populate map with data point
+			readJSONFile('mapData/' + year + "/" + month + "/" + fileName);
+			//Set the map center
 
-			/*Exit if no entry*/
+			/*
+			//Exit if no entry
 			if(place == "Place") {
 				printf("ERROR: No place selected");
 				return;
@@ -616,7 +650,7 @@
 				}
 			});
 
-			return
+			return*/
 		}
 
 		/**Google API Script**/
