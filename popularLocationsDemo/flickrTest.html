@@ -373,7 +373,7 @@
 
 			year = $('#year').text();
 			month = $('#month').text();
-
+/*
 			console.log("new test");
 
 									//At this point we know the directory exists
@@ -384,7 +384,7 @@
 									//$.get("mapData.", function(data) {
 
 
-									$.get("//jaitnium.github.io/popularLocationsDemo/mapData/2015/May/Paris_May_2015.json", function(data) {
+									//$.get("//jaitnium.github.io/popularLocationsDemo/mapData/2015/May/Paris_May_2015.json", function(data) {
 				    	
 									//$.get("mapData/" + year + "/" + month +"/.", function(data) {
 
@@ -432,12 +432,12 @@
 									}
 								});
 
-
+	*/
 			console.log("setPlaceDropdown Start..")
 			//Check for existence of mapData directory
 			$.ajax({
-				url:'mapData',
-				//url: 'mapData/2015/May/London_May_2015.json',
+				//url:'mapData',
+				url: 'mapData/2015/May/London_May_2015.json',
 				dataType: "json",
 				error: function() {
 					//Data points directory doesn't exist
