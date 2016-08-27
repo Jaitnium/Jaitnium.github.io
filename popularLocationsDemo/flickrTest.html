@@ -6,7 +6,7 @@
 	<!--Google maps API-->
 	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAy7OquTpBtqu6MW1kZg4vUdP1iDxPzycQ&libraries=visualization"></script>
 	<link href="https://fonts.googleapis.com/css?family=Bree+Serif" rel="stylesheet">
-
+	<script type="text/javascript" src="https://rawgithubusercontent.com/googlemaps/js-marker-clusterer/gh-pages/src/markerclusterer.js"></script>
 	<style>
 
 		.navbar .navbar-nav {
@@ -29,6 +29,8 @@
 		api_key = "082ca8bbb880bc514637527a4bfbe557";
 		//User ID
 		//user_id = "144329374@N06";
+		//Marker cluster
+		var markerCluster;
 
 		/*Given a flikr api method, and any number of arguments in the format of:
 		argumentName=value, return the url to be called using getJSON. This url will not
@@ -598,7 +600,15 @@
 					console.log("Retruning with center: " + avgCenter);
 
 					//Set center
-				   map.setCenter(new google.maps.LatLng(avgCenter.avgLat, avgCenter.avgLong));
+					map.setCenter(new google.maps.LatLng(avgCenter.avgLat, avgCenter.avgLong));
+
+					//Set markerCluster
+					var options = {
+						imagePath: 'images/m',
+						averageCenter: true
+					};
+
+					markerCluster = new MarkerClusterer(map, markers, options);
 				}
 			});
 		}
@@ -794,28 +804,51 @@
     		map.setCenter(recenter);
     	}
 
-    	function changeGradient() {
-    		var gradient = [
-    		'rgba(0, 255, 255, 0)',
-    		'rgba(0, 255, 255, 1)',
-    		'rgba(0, 191, 255, 1)',
-    		'rgba(0, 127, 255, 1)',
-    		'rgba(0, 63, 255, 1)',
-    		'rgba(0, 0, 255, 1)',
-    		'rgba(0, 0, 223, 1)',
-    		'rgba(0, 0, 191, 1)',
-    		'rgba(0, 0, 159, 1)',
-    		'rgba(0, 0, 127, 1)',
-    		'rgba(63, 0, 91, 1)',
-    		'rgba(127, 0, 63, 1)',
-    		'rgba(191, 0, 31, 1)',
-    		'rgba(255, 0, 0, 1)'
-    		]
-    		heatmap.set('gradient', heatmap.get('gradient') ? null : gradient);
-    	}
+    	//Toggle marker clusters
+    	function toggleMC() {
+    		//console.log(markerCluster.getTotalMarkers())
 
-    	function changeOpacity() {
-    		document.getElementById('opacityVal').innerHTML = document.getElementById('opacityRange').value;
+    		if(markerCluster.getTotalMarkers() == 0) {
+    			console.log("Creating markerClusters..")
+    			//console.log(markerCluster.getTotalMarkers())
+				//Set markerCluster
+				var options = {
+					imagePath: 'images/m'
+					averageCenter: true
+				};
+
+				markerCluster = new MarkerClusterer(map, markers, options);
+				markerCluster.redraw();
+    		}
+    		else {
+    			console.log("Clearing markerClusters...")
+       			//console.log(markerCluster.getTotalMarkers())
+    			markerCluster.clearMarkers();
+    		}
+		}
+
+		function changeGradient() {
+			var gradient = [
+			'rgba(0, 255, 255, 0)',
+			'rgba(0, 255, 255, 1)',
+			'rgba(0, 191, 255, 1)',
+			'rgba(0, 127, 255, 1)',
+			'rgba(0, 63, 255, 1)',
+			'rgba(0, 0, 255, 1)',
+			'rgba(0, 0, 223, 1)',
+			'rgba(0, 0, 191, 1)',
+			'rgba(0, 0, 159, 1)',
+			'rgba(0, 0, 127, 1)',
+			'rgba(63, 0, 91, 1)',
+			'rgba(127, 0, 63, 1)',
+			'rgba(191, 0, 31, 1)',
+			'rgba(255, 0, 0, 1)'
+			]
+			heatmap.set('gradient', heatmap.get('gradient') ? null : gradient);
+		}
+
+		function changeOpacity() {
+			document.getElementById('opacityVal').innerHTML = document.getElementById('opacityRange').value;
 
 			//heatmap.set('maxIntensity', heatmap.get('maxIntensity') ? null : 5.0);
 			heatmap.set('opacity', document.getElementById('opacityRange').value);
@@ -897,17 +930,17 @@
 					
 					<span><strong>Technical Overview:</strong><br> This project uses flickr to obtain hundreds of thousands of picture locations. Each picture has a latitude, longitude, and date in which it was taken. A local python script uses the flickr api to create JSON files of picture locations. The user specifies a month of a given year and then what city they want displayed. The corresponding JSON file is read and the locations are mapped using the google maps api. A heatmap layer is then applied to the map so it's easier to see where the most activity is.</span>
 
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 				</div>
 			</div>
 		</div>
+	</div>
 
 
 
-		<div id="googleMap" style="width:100%;height:80%;"></div>
+	<div id="googleMap" style="width:100%;height:80%;"></div>
 
 	<!--<label for="placeToFind">Enter a place on the map to be populated by photo geolocations:</label>
 	<input type="text" placeholder="continent, country, region, locality, or neighborhood" class="form-control" id="placeToFind">
@@ -922,7 +955,7 @@
 	<button class="btn btn-danger" id="markerToggle" onclick="toggleMarkers()">Toggle Markers</button>
 	<button class="btn btn-danger" id="heatmapToggle" onclick="toggleHeatmap()">Toggle Heatmap</button>
 	<button class="btn btn-danger" id="changeGradient" onclick="changeGradient()">Change Gradient</button>
-
+	<button class="btn btn-danger" id="toggleMC" onclick="toggleMC()">Toggle Marker Cluster</button>
 <!--
 	<button class="btn btn-danger" id="changeRadius" onclick="changeRadius()">Change Radius</button>
 	<button class="btn btn-danger" id="changeOpacity" onclick="changeOpacity()">Change Opacity</button>
