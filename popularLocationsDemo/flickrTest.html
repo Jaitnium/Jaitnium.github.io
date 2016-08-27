@@ -556,6 +556,7 @@
 					return					
 				},
 				success: function(json) {
+					var avgCenter = {avgLat: 0, avgLong: 0};
 					console.log(json);
 					console.log(json.photos.photo[0]);
 					for(var i = 0; i < json.photos.photo.length; i++) {
@@ -563,18 +564,27 @@
                     	//Circle
                     	var myIcon = new google.maps.MarkerImage("http://worldartsme.com/images/clip-art-red-dot-clipart-1.jpg", null, null, null, new google.maps.Size(10,10));
 
-                    	//Camera
-						//var myIcon = new google.maps.MarkerImage("http://icons.iconarchive.com/icons/pelfusion/long-shadow-media/512/Camera-icon.png", null, null, null, new google.maps.Size(20,20));
-
+						//Create a new marker
 						var marker=new google.maps.Marker({
 							icon: myIcon,
 							position: new google.maps.LatLng(json.photos.photo[i].latitude, json.photos.photo[i].longitude)
 						});
+
+						//console.log(avgCenter)
+
+						//Update avgLat and avgLong
+						avgCenter.avgLat += Number(json.photos.photo[i].latitude);
+						avgCenter.avgLong += Number(json.photos.photo[i].longitude);
+
 						//console.log(typeof(json.photos.photo[i].latitude));
 						//Don't show markers by default
 						//marker.setMap(map);
 						markers.push(marker);
 					}
+
+					//Final avgCenter
+					avgCenter.avgLat /= json.photos.photo.length;
+					avgCenter.avgLong /= json.photos.photo.length;
 
 					$("#numDisplayed").text(json.photos.photo.length);
 
@@ -584,6 +594,11 @@
 
 					/*Enable button*/
 					document.getElementById("displayBtn").disabled = false;
+
+					console.log("Retruning with center: " + avgCenter);
+
+					//Set center
+				   map.setCenter(new google.maps.LatLng(avgCenter.avgLat, avgCenter.avgLong));
 				}
 			});
 		}
@@ -602,7 +617,8 @@
 			fileName = place + "_" + month + "_" + year + ".json"
 			//Populate map with data point
 			readJSONFile('mapData/' + year + "/" + month + "/" + fileName);
-			//Set the map center
+
+			//setMapCenter(place);
 
 			/*
 			//Exit if no entry
