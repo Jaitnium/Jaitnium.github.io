@@ -141,9 +141,10 @@ def printYearUsage():
 
 #Print all usages
 def printAllUsage():
-	printRawUsage()
-	printMonthUsage()
-	printYearUsage()
+    printRawUsage()
+    printMonthUsage()
+    printYearUsage()
+    print("To force update index.json:\n python getflickrData.py -ui")
 
 def verifyDate(datestring):
     try:
@@ -279,6 +280,9 @@ def verifyArguments(flag):
             print("Year verified!")
             #All "year" arguments verified. Return
             return;
+    #Check argument for "update index.json" usage
+    if(flag == '-ui'):
+        return;      
     #Any other arguments will cause the check to fail and exit
     else:
         printAllUsage()
@@ -323,7 +327,20 @@ def createMonthJSON(placeToFind, month, year):
         os.remove(path + "/" + fileName)
         os.rename(fileName, path + "/" + fileName)
 
+#This function creates a file called "index.json" with the folder structure of the given path
+def createIndexJSON(path):
+    d = {'name': os.path.basename(path)}
+    if os.path.isdir(path):
+        d['type'] = "directory"
+        d['children'] = [createIndexJSON(os.path.join(path,x)) for x in os.listdir\
+(path)]
+    else:
+        d['type'] = "file"
+    return d
+
 #MAIN START
+#Outfile is the name of the json file that contains the mapData structure
+outfile = "index.json"
 #Verify the arguments are valid
 verifyArguments(sys.argv[1])
 
@@ -351,6 +368,10 @@ if(sys.argv[1] == '-m'):
     #Create the month's JSON, and place into the correct folder (creates it if it doesn't exist)
     createMonthJSON(placeToFind, month, year)
 
+    #Create an index.json that reflects the changes
+    with open(outfile, 'w') as outfile:
+       json.dump(createIndexJSON('mapData'), outfile, indent=4, sort_keys=True, separators=(',', ':'))
+
 #If "year" usage
 if(sys.argv[1] == '-y'):
     placeToFind = sys.argv[2];
@@ -371,4 +392,15 @@ if(sys.argv[1] == '-y'):
     createMonthJSON(placeToFind, 'November', year)
     createMonthJSON(placeToFind, 'December', year)
 
+    #Create an index.json that reflects the changes
+    with open(outfile, 'w') as outfile:
+       json.dump(createIndexJSON('mapData'), outfile, indent=4, sort_keys=True, separators=(',', ':'))
 
+#If "update index.json" usage
+if(sys.argv[1] == '-ui'):
+
+    #Create an index.json that reflects the changes
+    with open(outfile, 'w') as outfile:
+       json.dump(createIndexJSON('mapData'), outfile, indent=4, sort_keys=True, separators=(',', ':'))
+
+    print("index.json updated")    

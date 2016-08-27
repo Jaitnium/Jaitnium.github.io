@@ -373,67 +373,14 @@
 
 			year = $('#year').text();
 			month = $('#month').text();
-/*
-			console.log("new test");
 
-									//At this point we know the directory exists
-									//Get everything at subdirectory
-								    //$.get("https://github.com/Jaitnium/Jaitnium.github.io/tree/master/popularLocationsDemo/mapData/2015/February", function(data) {
-
-								    //404 not found:
-									//$.get("mapData.", function(data) {
-
-
-									//$.get("//jaitnium.github.io/popularLocationsDemo/mapData/2015/May/Paris_May_2015.json", function(data) {
-				    	
-									//$.get("mapData/" + year + "/" + month +"/.", function(data) {
-
-										//console.log(data);
-										//Set filesRet to show files at subdirectory
-										//Try to load the data into filesReturned
-										try {
-											$("#filesReturned").html(data);
-											$("#filesReturned").find('a:contains(".json")').each(function () {
-												//console.log("First try: " + this.href.replace("http:///", "").split("/"))
-
-												var array = this.href.replace(window.location.host, "").replace("http:///", "").split("/");
-                                            	//The last array element wil be the fileName
-                                            	var fileName = array[array.length-1];
-                                            	console.log("Filename: " + array[array.length-1]);
-                                            	var fullPath = "mapData/" + year + "/" + month + "/" + fileName;
-                                            	console.log("FullPath: " + fullPath);
-
-												//Now parse the place from the filename and add that option to the placeDropdown
-												array = fileName.split("_");
-												var place = array[0];
-												console.log("Place: " + place);
-												$("#placeFiles").append("<li><a href='javascript:void(0);' onclick='$(&#34;#place&#34;).text($(this).text())'>" + place + "</a></li>")
-											});
-										}
-										//If error then this isn't being run locally
-										catch(err) {
-										//For each .json file found
-										//Add it's entry to the list of dropdown options
-										$(data).find('a:contains(".json")').each(function () {
-											var array = this.href.replace(window.location.host, "").replace("http:///", "").split("/");
-                                            //The last array element wil be the fileName
-                                            var fileName = array[array.length-1];
-                                            console.log("Filename: " + array[array.length-1]);
-                                            var fullPath = "mapData/" + year + "/" + month + "/" + fileName;
-                                            console.log("FullPath: " + fullPath);
-
-											//Now parse the place from the filename and add that option to the placeDropdown
-											array = fileName.split("_");
-											var place = array[0];
-											console.log("Place: " + place);
-
-											$("#placeFiles").append("<li><a href='javascript:void(0);' onclick='$(&#34;#place&#34;).text($(this).text())'>" + place + "</a></li>")
-										});
-									}
-								});
-
-	*/
 			console.log("setPlaceDropdown Start..")
+
+			//Look up directory structure stored in index.json
+			$.getJSON("index.json", function(json) {
+				console.log(json)
+			})
+			/*
 			//Check for existence of mapData directory
 			$.ajax({
 				//url:'mapData',
@@ -520,9 +467,8 @@
 						}
 					});
 				}
-			});
-
-			return			
+			});*/
+			return		
 
 		}
 
