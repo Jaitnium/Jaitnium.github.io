@@ -378,8 +378,49 @@
 
 			//Look up directory structure stored in index.json
 			$.getJSON("index.json", function(json) {
-				console.log(json)
-			})
+				console.log(json);
+
+				yearIndex = -1;
+				monthIndex = -1;
+				//First look into the correct year directory
+				for(var i = 0; i < json.children.length; i++) {
+					if(json.children[i].type == "directory" && json.children[i].name == year) {
+						console.log("Year directory " + json.children[i].name + " found.")
+						yearIndex = i;
+					}
+				}
+				//Signal error if no such folder exists
+				if(yearIndex == -1) {
+					console.log("ERROR: Specified year doesn't have a correponding folder. Exiting...")
+					return;
+				}
+
+				//Then look into the correct month directory
+				for(var i = 0; i < json.children[yearIndex].children.length; i++) {
+					if(json.children[yearIndex].children[i].type == "directory" && json.children[yearIndex].children[i].name == month) {
+						console.log("Month directory " + json.children[yearIndex].children[i].name + " found.")
+						monthIndex = i;
+					}
+				}
+				//Signal error if no such folder exists
+				if(yearIndex == -1) {
+					console.log("ERROR: Specified year doesn't have a correponding folder. Exiting...")
+					return;
+				}
+
+				//Now we have the year and month index of the files we want to display
+				//Then display the files in this directory
+				for(var i = 0; i < json.children[yearIndex].children[monthIndex].children.length; i++) {
+					//Retrieve a fileName
+					fileName = json.children[yearIndex].children[monthIndex].children[i].name;
+					//Parse the name to display on the dropdown
+					displayName = fileName.split("_")[0];
+					console.log(displayName);
+					//Put the name on the dropdown
+					$("#placeFiles").append("<li><a href='javascript:void(0);' onclick='$(&#34;#place&#34;).text($(this).text())'>" + displayName + "</a></li>")
+				}
+
+			});
 			/*
 			//Check for existence of mapData directory
 			$.ajax({
