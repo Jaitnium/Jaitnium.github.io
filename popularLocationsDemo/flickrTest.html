@@ -613,7 +613,7 @@
 			});
 		}
 
-		function readJSONFiles() {
+		function readJSONFiles(year, month, place) {
 			/*Disable "Display Locations" btn until done*/
 			console.log("disabling btn")
 			document.getElementById("displayBtn").disabled = true;
@@ -621,9 +621,9 @@
 			clearMarkers()
 			clearHeatMap()
 
-			year = $('#year').text();
-			month = $('#month').text();
-			place = $('#place').text();
+			//year = $('#year').text();
+			//month = $('#month').text();
+			//place = $('#place').text();
 			fileName = place + "_" + month + "_" + year + ".json"
 			//Populate map with data point
 			readJSONFile('mapData/' + year + "/" + month + "/" + fileName);
@@ -875,6 +875,15 @@
 			console.log(val);
 		})
 
+		//Given a place, year, and month
+		//Load the correponsing JSON file, map it to google maps, init the clustering, set the zoom level
+		//Retreive a list of clusters and their lat + longs
+		//Reverse lookup each lat + long, put it into a JSON style format
+		//Return the 
+		function getHotSpotJSON(place, year, month, zoom) {
+
+		}
+
 		//Test function for testing local ghost file
 		function myTestFunc(text){
 			//console.log(text);
@@ -1027,7 +1036,7 @@
 
 			<div class="col-sm-3" style="padding:2px">
 				<center>
-					<button id="displayBtn" class="btn btn-warning btn-lg btn-block" type="button" onclick="readJSONFiles()">Display Locations</button>
+					<button id="displayBtn" class="btn btn-warning btn-lg btn-block" type="button" onclick="readJSONFiles($('#year').text(), $('#month').text(), $('#place').text())">Display Locations</button>
 				</center>
 			</div>
 		</div>
