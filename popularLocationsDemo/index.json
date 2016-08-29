@@ -503,7 +503,23 @@
                             "type":"file"
                         },
                         {
+                            "name":"SanFrancisco_Fall_2015.json",
+                            "type":"file"
+                        },
+                        {
                             "name":"Sanfrancisco_January_2015.json",
+                            "type":"file"
+                        },
+                        {
+                            "name":"SanFrancisco_Spring_2015.json",
+                            "type":"file"
+                        },
+                        {
+                            "name":"SanFrancisco_Summer_2015.json",
+                            "type":"file"
+                        },
+                        {
+                            "name":"SanFrancisco_Winter_2015.json",
                             "type":"file"
                         },
                         {
