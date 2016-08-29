@@ -894,6 +894,40 @@
 			}
 		}
 
+		function HotSpotHandler() {
+			var ret = getHotSpotJSON('2015', 'January', 'Sanfrancisco', 17);
+			console.log("Returned: " + ret);
+
+			console.log("returning2..");
+		}
+
+		/*function HotSpotHandler() {
+			var ret = getHotSpotJSON('2015', 'January', 'Sanfrancisco', 17);
+			console.log("Returned: " + ret);
+			if(ret == undefined) {
+				
+				setTimeout(function() {
+ 				if (!googleMapsLoaded) {
+     			//we have waited 5 secs, google maps is not loaded yet
+     				console.log('google maps is not loaded');
+  				}
+  				else {
+  					console.log('google maps loaded');
+  					return markerCluster.getTotalClusters();
+  				}    
+			}, 5000);
+
+			console.log("returning1..");
+			}
+			console.log("returning2..");
+		}*/
+
+		function sleep (time) {
+ 			return new Promise((resolve) => setTimeout(resolve, time));
+		}
+
+		googleMapsLoaded = false;
+
 		//Given a place, year, and month
 		//Load the correponsing JSON file, map it to google maps, init the clustering, set the zoom level
 		//Retreive a list of clusters and their lat + longs
@@ -930,9 +964,18 @@
     		    return tot;
 			});*/
 			google.maps.event.addListenerOnce(map, 'idle', function(){
-				console.log(markerCluster.getTotalClusters())
-    			return markerCluster.getTotalClusters();
+				console.log("Idle, total clusters: " + markerCluster.getTotalClusters())
+    			googleMapsLoaded = true;
 			});
+
+			// Usage!
+			sleep(500).then(() => {
+    		// Do something after the sleep!
+    			console.log("in sleep")
+			})
+
+			console.log("after sleep1")
+
 /*
 			while(markerCluster.getTotalClusters() == 0) {
 				console.log("waiting..");
@@ -942,6 +985,7 @@
 			console.log("LOADED")
     		alert(markerCluster.getTotalClusters())
     		return tot;*/
+
    		}
 
 		//Test function for testing local ghost file
@@ -1060,7 +1104,7 @@
 	<button class="btn btn-danger" id="toggleMC" onclick="toggleMC()">Toggle Marker Cluster</button>
 	<button class="btn btn-danger" id="totalC" onclick="totalC()">Total Clusters</button>
 	<button class="btn btn-danger" id="toggleC" onclick="toggleC()">Toggle GridSize</button>
-	<button class="btn btn-danger" id="ghostSimulation" onclick="getHotSpotJSON('2015', 'January', 'Sanfrancisco', 17)">Ghost Simulation</button>
+	<button class="btn btn-danger" id="ghostSimulation" onclick="HotSpotHandler()">Ghost Simulation</button>
 
 <!--
 	<button class="btn btn-danger" id="changeRadius" onclick="changeRadius()">Change Radius</button>
