@@ -882,6 +882,18 @@
 			console.log(val);
 		})
 
+		function recheck() {
+			if(markerCluster.getTotalClusters() == 0) {
+				setTimeout(recheck(), 1000);
+				return;
+			}
+			else {
+				console.log("LOADED")
+    			alert(markerCluster.getTotalClusters())
+    			return markerCluster.getTotalClusters();				
+			}
+		}
+
 		//Given a place, year, and month
 		//Load the correponsing JSON file, map it to google maps, init the clustering, set the zoom level
 		//Retreive a list of clusters and their lat + longs
@@ -908,11 +920,28 @@
 
    			tot = markerCluster.getTotalClusters();
    			console.log(markers.length)
-			google.maps.event.addListenerOnce(map, 'idle', function(){
+
+   			/*while(markerCluster.getTotalClusters() == 0) {
+   				console.log("waiting..");
+   			}*/
+			/*google.maps.event.addListenerOnce(map, 'idle', function(){
     		    console.log("LOADED")
     		    alert(markerCluster.getTotalClusters())
     		    return tot;
+			});*/
+			google.maps.event.addListenerOnce(map, 'idle', function(){
+				console.log(markerCluster.getTotalClusters())
+    			return markerCluster.getTotalClusters();
 			});
+/*
+			while(markerCluster.getTotalClusters() == 0) {
+				console.log("waiting..");
+				setTimeout(recheck(), 1000);
+			}
+
+			console.log("LOADED")
+    		alert(markerCluster.getTotalClusters())
+    		return tot;*/
    		}
 
 		//Test function for testing local ghost file
