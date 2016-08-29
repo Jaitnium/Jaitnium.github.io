@@ -966,16 +966,17 @@
 			google.maps.event.addListenerOnce(map, 'idle', function(){
 				console.log("Idle, total clusters: " + markerCluster.getTotalClusters())
     			googleMapsLoaded = true;
+    			
 			});
 
 			// Usage!
-			sleep(500).then(() => {
+			/*sleep(500).then(() => {
     		// Do something after the sleep!
     			console.log("in sleep")
 			})
 
 			console.log("after sleep1")
-
+			*/
 /*
 			while(markerCluster.getTotalClusters() == 0) {
 				console.log("waiting..");
@@ -985,7 +986,7 @@
 			console.log("LOADED")
     		alert(markerCluster.getTotalClusters())
     		return tot;*/
-
+    		
    		}
 
 		//Test function for testing local ghost file
