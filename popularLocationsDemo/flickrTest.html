@@ -922,10 +922,6 @@
 			console.log("returning2..");
 		}*/
 
-		function sleep (time) {
- 			return new Promise((resolve) => setTimeout(resolve, time));
-		}
-
 		googleMapsLoaded = false;
 
 		//Given a place, year, and month
@@ -966,7 +962,7 @@
 			google.maps.event.addListenerOnce(map, 'idle', function(){
 				console.log("Idle, total clusters: " + markerCluster.getTotalClusters())
     			googleMapsLoaded = true;
-    			
+
 			});
 
 			// Usage!
@@ -986,7 +982,7 @@
 			console.log("LOADED")
     		alert(markerCluster.getTotalClusters())
     		return tot;*/
-    		
+
    		}
 
 		//Test function for testing local ghost file
