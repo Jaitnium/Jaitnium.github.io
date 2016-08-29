@@ -960,9 +960,9 @@
     		    return tot;
 			});*/
 			google.maps.event.addListenerOnce(map, 'idle', function(){
-				console.log("Idle, total clusters: " + markerCluster.getTotalClusters())
+				console.log("Idle, total clusters: " + markerCluster.getTotalClusters());
     			googleMapsLoaded = true;
-
+    			$("#HSRet").text("Total Clusters: " + markerCluster.getTotalClusters());
 			});
 
 			// Usage!
@@ -1195,7 +1195,7 @@
 
 <!--<p id="filesReturned"></p>-->
 <p id="filesReturned" style="display:none"></p> 
-
+<p id="HSRet"></p>
 
 </body>  
 </html>  
