@@ -6,7 +6,7 @@
 	<!--Google maps API-->
 	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAy7OquTpBtqu6MW1kZg4vUdP1iDxPzycQ&libraries=visualization"></script>
 	<link href="https://fonts.googleapis.com/css?family=Bree+Serif" rel="stylesheet">
-	<script type="text/javascript" src="https://rawgithubusercontent.com/googlemaps/js-marker-clusterer/gh-pages/src/markerclusterer.js"></script>
+	<script type="text/javascript" src="https://rawgithubusercontent.com/mahnunchik/markerclustererplus/master/src/markerclusterer.js"></script>
 	<style>
 
 		.navbar .navbar-nav {
@@ -951,38 +951,20 @@
    			tot = markerCluster.getTotalClusters();
    			console.log(markers.length)
 
-   			/*while(markerCluster.getTotalClusters() == 0) {
-   				console.log("waiting..");
-   			}*/
-			/*google.maps.event.addListenerOnce(map, 'idle', function(){
-    		    console.log("LOADED")
-    		    alert(markerCluster.getTotalClusters())
-    		    return tot;
-			});*/
 			google.maps.event.addListenerOnce(map, 'idle', function(){
 				console.log("Idle, total clusters: " + markerCluster.getTotalClusters());
     			googleMapsLoaded = true;
-    			$("#HSRet").text("Total Clusters: " + markerCluster.getTotalClusters());
+    			var clusters = markerCluster.getClusters();
+    			var result = "";
+    			for(var i = 0; i < clusters.length; i++) {
+    				//console.log(clusters[i].getCenter().lat());
+       				//console.log(clusters[i].getCenter().lng());
+       				result += i + ": " + clusters[i].getCenter().lat() + " " + clusters[i].getCenter().lng() + "\n";
+    			}
+    			alert(result);
 			});
 
-			// Usage!
-			/*sleep(500).then(() => {
-    		// Do something after the sleep!
-    			console.log("in sleep")
-			})
-
-			console.log("after sleep1")
-			*/
-/*
-			while(markerCluster.getTotalClusters() == 0) {
-				console.log("waiting..");
-				setTimeout(recheck(), 1000);
-			}
-
-			console.log("LOADED")
-    		alert(markerCluster.getTotalClusters())
-    		return tot;*/
-
+			return tot
    		}
 
 		//Test function for testing local ghost file
@@ -1195,7 +1177,6 @@
 
 <!--<p id="filesReturned"></p>-->
 <p id="filesReturned" style="display:none"></p> 
-<p id="HSRet">Temp</p>
 
 </body>  
 </html>  
