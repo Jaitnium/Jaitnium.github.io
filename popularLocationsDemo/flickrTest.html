@@ -890,7 +890,7 @@
 		function getHotSpotJSON(year, month, place, zoom) {
 			readJSONFiles(year, month, place);
 
-			zoom = zoom;
+			map.setZoom(zoom)
 
 			//Override function to get ALL cluster spots (even outside of viewport)
 			MarkerClusterer.prototype.createClusters_ = function() {
@@ -907,7 +907,12 @@
    			};
 
    			tot = markerCluster.getTotalClusters();
-   			return tot;
+   			console.log(markers.length)
+			google.maps.event.addListenerOnce(map, 'idle', function(){
+    		    console.log("LOADED")
+    		    console.log(markerCluster.getTotalClusters())
+    		    return tot;
+			});
    		}
 
 		//Test function for testing local ghost file
@@ -1026,6 +1031,7 @@
 	<button class="btn btn-danger" id="toggleMC" onclick="toggleMC()">Toggle Marker Cluster</button>
 	<button class="btn btn-danger" id="totalC" onclick="totalC()">Total Clusters</button>
 	<button class="btn btn-danger" id="toggleC" onclick="toggleC()">Toggle GridSize</button>
+	<button class="btn btn-danger" id="ghostSimulation" onclick="getHotSpotJSON('2015', 'January', 'Sanfrancisco', 17)">Ghost Simulation</button>
 
 <!--
 	<button class="btn btn-danger" id="changeRadius" onclick="changeRadius()">Change Radius</button>
