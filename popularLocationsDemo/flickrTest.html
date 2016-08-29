@@ -551,6 +551,7 @@
 			$.ajax({
 				dataType: 'json',
 				url: path,
+				async: false,
 				error: function() {
 					//Data points directory doesn't exist
 					console.log("ERROR: couldn't read JSON file '" + path + "'. Exiting...");
@@ -609,6 +610,8 @@
 					};
 
 					markerCluster = new MarkerClusterer(map, markers, options);
+
+					console.log(markerCluster.getTotalClusters());
 				}
 			});
 		}
@@ -627,6 +630,8 @@
 			fileName = place + "_" + month + "_" + year + ".json"
 			//Populate map with data point
 			readJSONFile('mapData/' + year + "/" + month + "/" + fileName);
+
+			//toggleMarkers();
 
 			//setMapCenter(place);
 
@@ -702,11 +707,12 @@
 		var markers = [];
 		var heatMapData = [];
 		var heatmap;
+		var zoom = 5;
 
 		function initialize() {
 			var mapProp = {
 				center:myCenter,
-				zoom:5,
+				zoom:zoom,
 				mapTypeId:google.maps.MapTypeId.ROADMAP
 			};
 
@@ -722,6 +728,7 @@
     	function showMarkers() {
     		console.log("showMarkers called, length: " + markers.length);
     		for(var i = 0; i < markers.length; i++) {
+    			console.log(i);
     			markers[i].setMap(map);
     		}
     	}
@@ -819,36 +826,36 @@
 
 				markerCluster = new MarkerClusterer(map, markers, options);
 				markerCluster.redraw();
-    		}
-    		else {
-    			console.log("Clearing markerClusters...")
+			}
+			else {
+				console.log("Clearing markerClusters...")
        			//console.log(markerCluster.getTotalMarkers())
-    			markerCluster.clearMarkers();
-    		}
-		}
+       			markerCluster.clearMarkers();
+       		}
+       	}
 
-		function changeGradient() {
-			var gradient = [
-			'rgba(0, 255, 255, 0)',
-			'rgba(0, 255, 255, 1)',
-			'rgba(0, 191, 255, 1)',
-			'rgba(0, 127, 255, 1)',
-			'rgba(0, 63, 255, 1)',
-			'rgba(0, 0, 255, 1)',
-			'rgba(0, 0, 223, 1)',
-			'rgba(0, 0, 191, 1)',
-			'rgba(0, 0, 159, 1)',
-			'rgba(0, 0, 127, 1)',
-			'rgba(63, 0, 91, 1)',
-			'rgba(127, 0, 63, 1)',
-			'rgba(191, 0, 31, 1)',
-			'rgba(255, 0, 0, 1)'
-			]
-			heatmap.set('gradient', heatmap.get('gradient') ? null : gradient);
-		}
+       	function changeGradient() {
+       		var gradient = [
+       		'rgba(0, 255, 255, 0)',
+       		'rgba(0, 255, 255, 1)',
+       		'rgba(0, 191, 255, 1)',
+       		'rgba(0, 127, 255, 1)',
+       		'rgba(0, 63, 255, 1)',
+       		'rgba(0, 0, 255, 1)',
+       		'rgba(0, 0, 223, 1)',
+       		'rgba(0, 0, 191, 1)',
+       		'rgba(0, 0, 159, 1)',
+       		'rgba(0, 0, 127, 1)',
+       		'rgba(63, 0, 91, 1)',
+       		'rgba(127, 0, 63, 1)',
+       		'rgba(191, 0, 31, 1)',
+       		'rgba(255, 0, 0, 1)'
+       		]
+       		heatmap.set('gradient', heatmap.get('gradient') ? null : gradient);
+       	}
 
-		function changeOpacity() {
-			document.getElementById('opacityVal').innerHTML = document.getElementById('opacityRange').value;
+       	function changeOpacity() {
+       		document.getElementById('opacityVal').innerHTML = document.getElementById('opacityRange').value;
 
 			//heatmap.set('maxIntensity', heatmap.get('maxIntensity') ? null : 5.0);
 			heatmap.set('opacity', document.getElementById('opacityRange').value);
@@ -880,15 +887,55 @@
 		//Retreive a list of clusters and their lat + longs
 		//Reverse lookup each lat + long, put it into a JSON style format
 		//Return the 
-		function getHotSpotJSON(place, year, month, zoom) {
+		function getHotSpotJSON(year, month, place, zoom) {
+			readJSONFiles(year, month, place);
 
-		}
+			zoom = zoom;
+
+			//Override function to get ALL cluster spots (even outside of viewport)
+			MarkerClusterer.prototype.createClusters_ = function() {
+				if (!this.ready_) {
+					return;
+				}
+
+				for (var i = 0, marker; marker = this.markers_[i]; i++) {
+   			 	//if (!marker.isAdded && this.isMarkerInBounds_(marker, bounds)) {    
+   			 		if (!marker.isAdded) {    
+   			 			this.addToClosestCluster_(marker);
+   			 		}
+   			 	}
+   			};
+
+   			tot = markerCluster.getTotalClusters();
+   			return tot;
+   		}
 
 		//Test function for testing local ghost file
 		function myTestFunc(text){
 			//console.log(text);
 			//alert(text);
 			return "Well I never" + text;
+		}
+
+		gridSize = 60;
+
+		function toggleC() {
+			if(gridSize == 60) {
+				gridSize = 300;
+				markerCluster.setGridSize(gridSize);
+			}
+			else {
+				gridSize = 60;
+				markerCluster.setGridSize(gridSize);
+			}
+		}
+
+		function totalC() {
+			console.log("Total clusters: " + markerCluster.getTotalClusters());
+			console.log("Grid size: " + markerCluster.getGridSize());
+			console.log("Zoom level: " + map.getZoom());
+			//console.log("Extended bounds: " + markerCluster.getExtendedBounds(""))
+
 		}
 
 	</script>
@@ -977,6 +1024,9 @@
 	<button class="btn btn-danger" id="heatmapToggle" onclick="toggleHeatmap()">Toggle Heatmap</button>
 	<button class="btn btn-danger" id="changeGradient" onclick="changeGradient()">Change Gradient</button>
 	<button class="btn btn-danger" id="toggleMC" onclick="toggleMC()">Toggle Marker Cluster</button>
+	<button class="btn btn-danger" id="totalC" onclick="totalC()">Total Clusters</button>
+	<button class="btn btn-danger" id="toggleC" onclick="toggleC()">Toggle GridSize</button>
+
 <!--
 	<button class="btn btn-danger" id="changeRadius" onclick="changeRadius()">Change Radius</button>
 	<button class="btn btn-danger" id="changeOpacity" onclick="changeOpacity()">Change Opacity</button>
