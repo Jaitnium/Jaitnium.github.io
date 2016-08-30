@@ -66,8 +66,14 @@ def queryflickrMonth(placeToFind, month, year):
 
     print("Number of geolocations dumping to file: " + str(page['photos']['total']))
 
+    #Correctly get the name of the place by parsing the first part of the returned '_content' field
+    placeName = placeFound['_content'].split(",")[0]
+
     #Create the fileName based on the arguments
-    outputName = placeFound['woe_name'] + "_" + month + "_" + year + ".json"
+    outputName = placeName + "_" + month + "_" + year + ".json"
+
+    print("Writing to file: " + outputName + " ...")
+
     #Dump into one json file using the name specified
     with open(outputName, 'w') as outfile:
 	    json.dump(page, outfile, indent=4, sort_keys=True, separators=(',', ':'))
@@ -121,6 +127,8 @@ def queryflickrRaw(placeToFind, mintakenDate, maxuptakenDate, outputName):
 
 
     print("Number of geolocations dumping to file: " + str(len(page['photos']['photo'])))
+
+    print("Writing to file: " + outputName + " ...")
 
     #Dump into one json file using the name specified
     with open(outputName + ".json", 'w') as outfile:
@@ -311,8 +319,12 @@ def createMonthJSON(placeToFind, month, year):
     if not os.path.exists(path):
         os.makedirs(path)
 
+    #Parse the name of the place from the returned filename
+    #and create a folder with that name if it doesn't exist
+    placeName = fileName.split("_")[0]
+
     #Check for month subdirectory
-    path = "./mapData/" + year + "/" + month
+    path = "./mapData/" + placeName + "/" + year + "/" + month
     #Create if it doesn't exist
     if not os.path.exists(path):
         os.makedirs(path)
@@ -339,7 +351,7 @@ def createIndexJSON(path):
     return d
 
 #MAIN START
-#Outfile is the name of the json file that contains the mapData structure
+#outfile is the name of the json file that contains the mapData structure
 outfile = "index.json"
 #Verify the arguments are valid
 verifyArguments(sys.argv[1])

@@ -359,19 +359,14 @@
 		//Filter the place dropdowns to show based on the month and year dropdown selections
 		//Set the text of the button called from
 		//Set place dropdowns if possible (both month +  year are valid, plus places to show in folder)
-		function filterClick(id, text) {
+		/*function filterClick(id, text) {
 			$(id).text(text)
 			//Remove any/all dropdown options already existing
-			$("#placeFiles").empty();
+			$("#placeDDList").empty();
 			$("#place").text("Place");
 			//Set the new dropdown options
 			setPlaceDropdown();
-		}
 
-		//Called whenever the month or year field is changed
-		//Updates the place dropdown according to the new directory location
-		function setPlaceDropdown() {
-			//$('#placeFiles').append(<li><a href="javascript:void(0);" onclick="$('#place').text( $(this).text() )">Edinburgh</a></li>);
 
 			year = $('#year').text();
 			month = $('#month').text();
@@ -419,100 +414,106 @@
 					displayName = fileName.split("_")[0];
 					console.log(displayName);
 					//Put the name on the dropdown
-					$("#placeFiles").append("<li><a href='javascript:void(0);' onclick='$(&#34;#place&#34;).text($(this).text())'>" + displayName + "</a></li>")
+					$("#placeDDList").append("<li><a href='javascript:void(0);' onclick='$(&#34;#place&#34;).text($(this).text())'>" + displayName + "</a></li>")
 				}
 
 			});
-			/*
-			//Check for existence of mapData directory
-			$.ajax({
-				//url:'mapData',
-				url: 'mapData/2015/May/London_May_2015.json',
-				dataType: "json",
-				error: function() {
-					//Data points directory doesn't exist
-					console.log("ERROR: expected directory named 'mapData'. Exiting...");
-					return
-				},
-				success: function() {
-					//Directory does exist
-					console.log("mapData exists..");
+			return	
 
-					//Check for existence of specified year subdirectory
-					$.ajax({
-						url:'mapData/' + year,
-						error: function() {
-							console.log("ERROR: no mapData for the specified year:" + year + ". Exiting...");
-							return
-						},
-						success: function() {
+		}*/
 
-						//Directory does exist
-						console.log("mapData/" + year + " subdirectory exists...");
+		//Called when a month is selected from the dropdown list
+		//Set the month dropdown button's text to the name of the month selected
+		function onMonthSelection(text, placeIndex, yearIndex, monthIndex) {
+			console.log("onMonthSelection called!")
+			//Set month dropdown button to text param
+			$("#month").text(text)
+		}
 
-							//Check for existence of specified month subdirectory
-							$.ajax({
-								url:'mapData/' + year + "/" + month,
-								error: function() {
-									console.log("ERROR: no month " + month + " subdirectory found. Exiting...");
-									return
-								},
-								success: function() {
-									//At this point we know the directory exists
-									//Get everything at subdirectory
-									$.get("mapData/" + year + "/" + month +"/.", function(data) {
+		//Called when a year is selected from the dropdown list
+		//Set the year dropdown button's text to the name of the year selected
+		//Remove any entries in monthDDList and add the newly selectable ones
+		//And call setMonthSelection
+		function onYearSelection(text, placeIndex, yearIndex) {
+			console.log("onYearSelection called!")
+			//Set year dropdown button to text param
+			$("#year").text(text)
 
-										//console.log(data);
-										//Set filesRet to show files at subdirectory
-										//Try to load the data into filesReturned
-										try {
-											$("#filesReturned").html(data);
-											$("#filesReturned").find('a:contains(".json")').each(function () {
-												//console.log("First try: " + this.href.replace("http:///", "").split("/"))
+			//Delete any entries on monthDDList
+			$("#monthDDList").empty()
+			$("#month").html("Month <span class='caret'></span>")
 
-												var array = this.href.replace(window.location.host, "").replace("http:///", "").split("/");
-                                            	//The last array element wil be the fileName
-                                            	var fileName = array[array.length-1];
-                                            	console.log("Filename: " + array[array.length-1]);
-                                            	var fullPath = "mapData/" + year + "/" + month + "/" + fileName;
-                                            	console.log("FullPath: " + fullPath);
+			//Look up directory structure stored in index.json to determine selectable months
+			$.getJSON("index.json", function(json) {
 
-												//Now parse the place from the filename and add that option to the placeDropdown
-												array = fileName.split("_");
-												var place = array[0];
-												console.log("Place: " + place);
-												$("#placeFiles").append("<li><a href='javascript:void(0);' onclick='$(&#34;#place&#34;).text($(this).text())'>" + place + "</a></li>")
-											});
-										}
-										//If error then this isn't being run locally
-										catch(err) {
-										//For each .json file found
-										//Add it's entry to the list of dropdown options
-										$(data).find('a:contains(".json")').each(function () {
-											var array = this.href.replace(window.location.host, "").replace("http:///", "").split("/");
-                                            //The last array element wil be the fileName
-                                            var fileName = array[array.length-1];
-                                            console.log("Filename: " + array[array.length-1]);
-                                            var fullPath = "mapData/" + year + "/" + month + "/" + fileName;
-                                            console.log("FullPath: " + fullPath);
-
-											//Now parse the place from the filename and add that option to the placeDropdown
-											array = fileName.split("_");
-											var place = array[0];
-											console.log("Place: " + place);
-
-											$("#placeFiles").append("<li><a href='javascript:void(0);' onclick='$(&#34;#place&#34;).text($(this).text())'>" + place + "</a></li>")
-										});
-									}
-								});
-								}
-							});
-						}
-					});
+				//Add months available to monthDDList
+				for(var monthIndex = 0; monthIndex < json.children[placeIndex].children[yearIndex].children.length; monthIndex++) {
+					$("#monthDDList").append("<li><a href='javascript:void(0);' onclick='onMonthSelection(this.text, " + placeIndex + ", " + yearIndex + ", " + monthIndex + ")'>" + json.children[placeIndex].children[yearIndex].children[monthIndex].name + "</a></li>")
+					console.log("Month directory " + json.children[placeIndex].children[yearIndex].children[monthIndex].name + " found.")					
 				}
-			});*/
-			return		
+			});
+			return
+		}
 
+		//Called when a place is selected from the dropdown list
+		//Set the place dropdown button's text to the name of the place selected
+		//Remove any entries in yearDDList and add the newly selectable ones
+		//And call setYearSelection
+		function onPlaceSelection(text) {
+			console.log("onPlaceSelection called!")
+			//Set place dropdown button to text param
+			$("#place").text(text)
+
+			//Delete any entries on yearDDList
+			$("#yearDDList").empty()
+			$("#year").html("Year <span class='caret'></span>")
+			//Delete any entries on monthDDList
+			$("#monthDDList").empty()
+			$("#month").html("Month <span class='caret'></span>")
+
+			//Look up directory structure stored in index.json to determine selectable years
+			$.getJSON("index.json", function(json) {
+				//Child index where to find the place directory
+				var placeIndex = 0;
+
+				//Iterate until the place directory index is found
+				while(json.children[placeIndex].name != text || json.children[placeIndex].type != "directory") {
+					placeIndex++;
+				}
+				
+				//Add years available to placeDDList
+				for(var yearIndex = 0; yearIndex < json.children[placeIndex].children.length; yearIndex++) {
+					$("#yearDDList").append("<li><a href='javascript:void(0);' onclick='onYearSelection(this.text, " + placeIndex + ", " + yearIndex + ")'>" + json.children[placeIndex].children[yearIndex].name + "</a></li>")
+					console.log("Year directory " + json.children[placeIndex].children[yearIndex].name + " found.")					
+				}
+			});
+			return
+		}
+
+		//Called when the page is loaded
+		//Updates the place dropdown list
+		function setPlaceDropdown() {
+
+			console.log("setPlaceDropdown Start..")
+
+			//Look up directory structure stored in index.json
+			$.getJSON("index.json", function(json) {
+				console.log(json);
+
+				//First look into the place directories
+				for(var i = 0; i < json.children.length; i++) {
+					//If a place directory is found
+					if(json.children[i].type == "directory") {
+						//Add it to the place dropdown list
+						//Add an onclick() function to set dropdown name to folder's name
+						/*$("#placeDDList").append("<li><a href='javascript:void(0);' onclick='$(&#34;#place&#34;).text($(this).text())'>" + json.children[i].name + "</a></li>")
+						console.log("Year directory " + json.children[i].name + " found.")*/
+						$("#placeDDList").append("<li><a href='javascript:void(0);' onclick='onPlaceSelection(this.text)'>" + json.children[i].name + "</a></li>")
+						console.log("Year directory " + json.children[i].name + " found.")
+					}
+				}
+			});
+			return		
 		}
 
 		function setMapZoom(place_type) {
@@ -618,18 +619,19 @@
 
 		function readJSONFiles(year, month, place) {
 			/*Disable "Display Locations" btn until done*/
-			console.log("disabling btn")
+			console.log("disabling btn");
 			document.getElementById("displayBtn").disabled = true;
 			/*Clear any other markers that exist*/
-			clearMarkers()
-			clearHeatMap()
+			clearMarkers();
+			clearHeatMap();
 
 			//year = $('#year').text();
 			//month = $('#month').text();
 			//place = $('#place').text();
-			fileName = place + "_" + month + "_" + year + ".json"
+			fileName = place + "_" + month + "_" + year + ".json";
 			//Populate map with data point
-			readJSONFile('mapData/' + year + "/" + month + "/" + fileName);
+			//readJSONFile('mapData/' + year + "/" + month + "/" + fileName);
+			readJSONFile('mapData/' + place + "/" + year + "/" + month + "/" + fileName);
 
 			//toggleMarkers();
 
@@ -877,50 +879,11 @@
 
 		google.maps.event.addDomListener(window, 'load', initialize);
 
+
 		$(document).ready(function() {
-			val = document.getElementById('displayBtn').innerHTML;
-			console.log(val);
+			//Set Place dropdown to the available places
+			setPlaceDropdown();
 		})
-
-		function recheck() {
-			if(markerCluster.getTotalClusters() == 0) {
-				setTimeout(recheck(), 1000);
-				return;
-			}
-			else {
-				console.log("LOADED")
-    			alert(markerCluster.getTotalClusters())
-    			return markerCluster.getTotalClusters();				
-			}
-		}
-
-		function HotSpotHandler() {
-			var ret = getHotSpotJSON('2015', 'January', 'Sanfrancisco', 17);
-			console.log("Returned: " + ret);
-
-			console.log("returning2..");
-		}
-
-		/*function HotSpotHandler() {
-			var ret = getHotSpotJSON('2015', 'January', 'Sanfrancisco', 17);
-			console.log("Returned: " + ret);
-			if(ret == undefined) {
-				
-				setTimeout(function() {
- 				if (!googleMapsLoaded) {
-     			//we have waited 5 secs, google maps is not loaded yet
-     				console.log('google maps is not loaded');
-  				}
-  				else {
-  					console.log('google maps loaded');
-  					return markerCluster.getTotalClusters();
-  				}    
-			}, 5000);
-
-			console.log("returning1..");
-			}
-			console.log("returning2..");
-		}*/
 
 		googleMapsLoaded = false;
 
@@ -946,54 +909,26 @@
    			 			this.addToClosestCluster_(marker);
    			 		}
    			 	}
-   			};
+   			 };
 
-   			tot = markerCluster.getTotalClusters();
-   			console.log(markers.length)
+   			 tot = markerCluster.getTotalClusters();
+   			 console.log(markers.length)
 
-			google.maps.event.addListenerOnce(map, 'idle', function(){
-				console.log("Idle, total clusters: " + markerCluster.getTotalClusters());
-    			googleMapsLoaded = true;
-    			var clusters = markerCluster.getClusters();
-    			var result = "";
-    			for(var i = 0; i < clusters.length; i++) {
+   			 google.maps.event.addListenerOnce(map, 'idle', function(){
+   			 	console.log("Idle, total clusters: " + markerCluster.getTotalClusters());
+   			 	googleMapsLoaded = true;
+   			 	var clusters = markerCluster.getClusters();
+   			 	var result = "";
+   			 	for(var i = 0; i < clusters.length; i++) {
     				//console.log(clusters[i].getCenter().lat());
        				//console.log(clusters[i].getCenter().lng());
        				result += i + ": " + clusters[i].getCenter().lat() + " " + clusters[i].getCenter().lng() + "\n";
-    			}
-    			alert(result);
-			});
+       			}
+       			alert(result);
+       		});
 
-			return tot
-   		}
-
-		//Test function for testing local ghost file
-		function myTestFunc(text){
-			//console.log(text);
-			//alert(text);
-			return "Well I never" + text;
-		}
-
-		gridSize = 60;
-
-		function toggleC() {
-			if(gridSize == 60) {
-				gridSize = 300;
-				markerCluster.setGridSize(gridSize);
-			}
-			else {
-				gridSize = 60;
-				markerCluster.setGridSize(gridSize);
-			}
-		}
-
-		function totalC() {
-			console.log("Total clusters: " + markerCluster.getTotalClusters());
-			console.log("Grid size: " + markerCluster.getGridSize());
-			console.log("Zoom level: " + map.getZoom());
-			//console.log("Extended bounds: " + markerCluster.getExtendedBounds(""))
-
-		}
+   			 return tot
+   			}
 
 	</script>
 </head>  
@@ -1081,9 +1016,6 @@
 	<button class="btn btn-danger" id="heatmapToggle" onclick="toggleHeatmap()">Toggle Heatmap</button>
 	<button class="btn btn-danger" id="changeGradient" onclick="changeGradient()">Change Gradient</button>
 	<button class="btn btn-danger" id="toggleMC" onclick="toggleMC()">Toggle Marker Cluster</button>
-	<button class="btn btn-danger" id="totalC" onclick="totalC()">Total Clusters</button>
-	<button class="btn btn-danger" id="toggleC" onclick="toggleC()">Toggle GridSize</button>
-	<button class="btn btn-danger" id="ghostSimulation" onclick="HotSpotHandler()">Ghost Simulation</button>
 
 <!--
 	<button class="btn btn-danger" id="changeRadius" onclick="changeRadius()">Change Radius</button>
@@ -1097,51 +1029,35 @@
 
 <div class="container">
 	<div class="row col-sm-12">
+
+		<!--Place Dropdown-->
+		<div class="dropup col-sm-3" style="text-align:center;padding:2px">
+			<button id="place" class="btn btn-primary btn-lg btn-block dropdown-toggle" type="button" data-toggle="dropdown">Place
+				<span class="caret"></span>
+			</button>
+			<ul id="placeDDList" class="dropdown-menu"></ul>
+		</div>
+
+		<!--Year Dropdown-->
+		<div class="dropup col-sm-3" style="text-align:center;padding:2px">
+			<button id="year" class="btn btn-primary btn-lg btn-block dropdown-toggle" type="button" data-toggle="dropdown">Year
+				<span class="caret">
+				</span>
+			</button>
+			<ul id="yearDDList" class="dropdown-menu">
+			</ul>
+		</div>
+
 		<!--Month Dropdown-->
 		<div class="dropup col-sm-3" style="text-align:center;padding:2px">
 			<button id="month" class="btn btn-primary btn-lg btn-block dropdown-toggle" type="button" data-toggle="dropdown">Month
 				<span class="caret"></span></button>
-				<ul class="dropdown-menu dropdown-menu-right">
-					<li><a href="javascript:void(0);" onclick="filterClick('#month', $(this).text() )">January</a></li>
-					<li><a href="javascript:void(0);" onclick="filterClick('#month', $(this).text() )">February</a></li>
-					<li><a href="javascript:void(0);" onclick="filterClick('#month', $(this).text() )">March</a></li>
-					<li><a href="javascript:void(0);" onclick="filterClick('#month', $(this).text() )">April</a></li>
-					<li><a href="javascript:void(0);" onclick="filterClick('#month', $(this).text() )">May</a></li>
-					<li><a href="javascript:void(0);" onclick="filterClick('#month', $(this).text() )">June</a></li>
-					<li><a href="javascript:void(0);" onclick="filterClick('#month', $(this).text() )">July</a></li>
-					<li><a href="javascript:void(0);" onclick="filterClick('#month', $(this).text() )">August</a></li>
-					<li><a href="javascript:void(0);" onclick="filterClick('#month', $(this).text() )">September</a></li>
-					<li><a href="javascript:void(0);" onclick="filterClick('#month', $(this).text() )">October</a></li>
-					<li><a href="javascript:void(0);" onclick="filterClick('#month', $(this).text() )">November</a></li>
-					<li><a href="javascript:void(0);" onclick="filterClick('#month', $(this).text() )">December</a></li>
+				<ul id="monthDDList" class="dropdown-menu dropdown-menu-right">
+					<!--<li><a href="javascript:void(0);" onclick="filterClick('#month', $(this).text() )">January</a></li>-->
 				</ul>
 			</div>
 
-			<!--Year Dropdown-->
-			<div class="dropup col-sm-3" style="text-align:center;padding:2px">
-				<button id="year" class="btn btn-primary btn-lg btn-block dropdown-toggle" type="button" data-toggle="dropdown">Year
-					<span class="caret">
-						
-					</span>
-				</button>
-				<ul class="dropdown-menu">
-					<li><a href="javascript:void(0);" onclick="filterClick('#year', $(this).text() )">2015</a></li>
-					<li><a href="javascript:void(0);" onclick="filterClick('#year', $(this).text() )">2014</a></li>
-					<!--<li><a href="javascript:void(0);" onclick="filterClick('#year', $(this).text() )">2013</a></li>
-					<li><a href="javascript:void(0);" onclick="filterClick('#year', $(this).text() )">2012</a></li>
-					<li><a href="javascript:void(0);" onclick="filterClick('#year', $(this).text() )">2011</a></li>
-					<li><a href="javascript:void(0);" onclick="filterClick('#year', $(this).text() )">2010</a></li>-->
-				</ul>
-			</div>
-
-			<!--Place Dropdown-->
-			<div class="dropup col-sm-3" style="text-align:center;padding:2px">
-				<button id="place" class="btn btn-primary btn-lg btn-block dropdown-toggle" type="button" data-toggle="dropdown">Place
-					<span class="caret"></span>
-				</button>
-				<ul id="placeFiles" class="dropdown-menu"></ul>
-			</div>
-
+			<!--Display Locations from JSON file btn-->
 			<div class="col-sm-3" style="padding:2px">
 				<center>
 					<button id="displayBtn" class="btn btn-warning btn-lg btn-block" type="button" onclick="readJSONFiles($('#year').text(), $('#month').text(), $('#place').text())">Display Locations</button>
