@@ -422,6 +422,19 @@
 
 		}*/
 
+		//Helper function for onYearSelection
+		//Return the index of the month subfolder that matches monthString
+		function getMonthIndex(json, placeIndex, yearIndex, monthString) {
+			//Loop through the list of month subdirectories until the directory name matches monthString
+			for(var monthIndex = 0; monthIndex < json.children[placeIndex].children[yearIndex].children.length; monthIndex++) {
+				if(json.children[placeIndex].children[yearIndex].children[monthIndex].name == monthString) {
+					return monthIndex;
+				}
+			}
+			//Else return -1 to indiciate it doesn't exist
+			return -1;
+		}
+
 		//Called when a month is selected from the dropdown list
 		//Set the month dropdown button's text to the name of the month selected
 		function onMonthSelection(text, placeIndex, yearIndex, monthIndex) {
@@ -447,9 +460,95 @@
 			$.getJSON("index.json", function(json) {
 
 				//Add months available to monthDDList
-				for(var monthIndex = 0; monthIndex < json.children[placeIndex].children[yearIndex].children.length; monthIndex++) {
+				//This sorts the months alphabetically
+				/*for(var monthIndex = 0; monthIndex < json.children[placeIndex].children[yearIndex].children.length; monthIndex++) {
 					$("#monthDDList").append("<li><a href='javascript:void(0);' onclick='onMonthSelection(this.text, " + placeIndex + ", " + yearIndex + ", " + monthIndex + ")'>" + json.children[placeIndex].children[yearIndex].children[monthIndex].name + "</a></li>")
 					console.log("Month directory " + json.children[placeIndex].children[yearIndex].children[monthIndex].name + " found.")					
+				}*/
+
+				//Add the folders by order of month by using the helper function
+				monthIndex = getMonthIndex(json, placeIndex, yearIndex, "January");
+				//If the folder exists
+				if(monthIndex != -1) {
+					$("#monthDDList").append("<li><a href='javascript:void(0);' onclick='onMonthSelection(this.text, " + placeIndex + ", " + yearIndex + ", " + monthIndex + ")'>" + json.children[placeIndex].children[yearIndex].children[monthIndex].name + "</a></li>")
+					console.log("Month directory " + json.children[placeIndex].children[yearIndex].children[monthIndex].name + " found.")
+				}	
+
+				monthIndex = getMonthIndex(json, placeIndex, yearIndex, "February");
+				//If the folder exists
+				if(monthIndex != -1) {
+					$("#monthDDList").append("<li><a href='javascript:void(0);' onclick='onMonthSelection(this.text, " + placeIndex + ", " + yearIndex + ", " + monthIndex + ")'>" + json.children[placeIndex].children[yearIndex].children[monthIndex].name + "</a></li>")
+					console.log("Month directory " + json.children[placeIndex].children[yearIndex].children[monthIndex].name + " found.")
+				}
+
+				monthIndex = getMonthIndex(json, placeIndex, yearIndex, "March");
+				//If the folder exists
+				if(monthIndex != -1) {
+					$("#monthDDList").append("<li><a href='javascript:void(0);' onclick='onMonthSelection(this.text, " + placeIndex + ", " + yearIndex + ", " + monthIndex + ")'>" + json.children[placeIndex].children[yearIndex].children[monthIndex].name + "</a></li>")
+					console.log("Month directory " + json.children[placeIndex].children[yearIndex].children[monthIndex].name + " found.")
+				}
+
+				monthIndex = getMonthIndex(json, placeIndex, yearIndex, "April");
+				//If the folder exists
+				if(monthIndex != -1) {
+					$("#monthDDList").append("<li><a href='javascript:void(0);' onclick='onMonthSelection(this.text, " + placeIndex + ", " + yearIndex + ", " + monthIndex + ")'>" + json.children[placeIndex].children[yearIndex].children[monthIndex].name + "</a></li>")
+					console.log("Month directory " + json.children[placeIndex].children[yearIndex].children[monthIndex].name + " found.")
+				}
+
+				monthIndex = getMonthIndex(json, placeIndex, yearIndex, "May");
+				//If the folder exists
+				if(monthIndex != -1) {
+					$("#monthDDList").append("<li><a href='javascript:void(0);' onclick='onMonthSelection(this.text, " + placeIndex + ", " + yearIndex + ", " + monthIndex + ")'>" + json.children[placeIndex].children[yearIndex].children[monthIndex].name + "</a></li>")
+					console.log("Month directory " + json.children[placeIndex].children[yearIndex].children[monthIndex].name + " found.")
+				}
+
+				monthIndex = getMonthIndex(json, placeIndex, yearIndex, "June");
+				//If the folder exists
+				if(monthIndex != -1) {
+					$("#monthDDList").append("<li><a href='javascript:void(0);' onclick='onMonthSelection(this.text, " + placeIndex + ", " + yearIndex + ", " + monthIndex + ")'>" + json.children[placeIndex].children[yearIndex].children[monthIndex].name + "</a></li>")
+					console.log("Month directory " + json.children[placeIndex].children[yearIndex].children[monthIndex].name + " found.")
+				}
+
+				monthIndex = getMonthIndex(json, placeIndex, yearIndex, "July");
+				//If the folder exists
+				if(monthIndex != -1) {
+					$("#monthDDList").append("<li><a href='javascript:void(0);' onclick='onMonthSelection(this.text, " + placeIndex + ", " + yearIndex + ", " + monthIndex + ")'>" + json.children[placeIndex].children[yearIndex].children[monthIndex].name + "</a></li>")
+					console.log("Month directory " + json.children[placeIndex].children[yearIndex].children[monthIndex].name + " found.")
+				}
+
+				monthIndex = getMonthIndex(json, placeIndex, yearIndex, "August");
+				//If the folder exists
+				if(monthIndex != -1) {
+					$("#monthDDList").append("<li><a href='javascript:void(0);' onclick='onMonthSelection(this.text, " + placeIndex + ", " + yearIndex + ", " + monthIndex + ")'>" + json.children[placeIndex].children[yearIndex].children[monthIndex].name + "</a></li>")
+					console.log("Month directory " + json.children[placeIndex].children[yearIndex].children[monthIndex].name + " found.")
+				}
+
+				monthIndex = getMonthIndex(json, placeIndex, yearIndex, "September");
+				//If the folder exists
+				if(monthIndex != -1) {
+					$("#monthDDList").append("<li><a href='javascript:void(0);' onclick='onMonthSelection(this.text, " + placeIndex + ", " + yearIndex + ", " + monthIndex + ")'>" + json.children[placeIndex].children[yearIndex].children[monthIndex].name + "</a></li>")
+					console.log("Month directory " + json.children[placeIndex].children[yearIndex].children[monthIndex].name + " found.")
+				}
+
+				monthIndex = getMonthIndex(json, placeIndex, yearIndex, "October");
+				//If the folder exists
+				if(monthIndex != -1) {
+					$("#monthDDList").append("<li><a href='javascript:void(0);' onclick='onMonthSelection(this.text, " + placeIndex + ", " + yearIndex + ", " + monthIndex + ")'>" + json.children[placeIndex].children[yearIndex].children[monthIndex].name + "</a></li>")
+					console.log("Month directory " + json.children[placeIndex].children[yearIndex].children[monthIndex].name + " found.")
+				}
+
+				monthIndex = getMonthIndex(json, placeIndex, yearIndex, "November");
+				//If the folder exists
+				if(monthIndex != -1) {
+					$("#monthDDList").append("<li><a href='javascript:void(0);' onclick='onMonthSelection(this.text, " + placeIndex + ", " + yearIndex + ", " + monthIndex + ")'>" + json.children[placeIndex].children[yearIndex].children[monthIndex].name + "</a></li>")
+					console.log("Month directory " + json.children[placeIndex].children[yearIndex].children[monthIndex].name + " found.")
+				}
+
+				monthIndex = getMonthIndex(json, placeIndex, yearIndex, "December");
+				//If the folder exists
+				if(monthIndex != -1) {
+					$("#monthDDList").append("<li><a href='javascript:void(0);' onclick='onMonthSelection(this.text, " + placeIndex + ", " + yearIndex + ", " + monthIndex + ")'>" + json.children[placeIndex].children[yearIndex].children[monthIndex].name + "</a></li>")
+					console.log("Month directory " + json.children[placeIndex].children[yearIndex].children[monthIndex].name + " found.")
 				}
 			});
 			return
@@ -613,6 +712,8 @@
 					markerCluster = new MarkerClusterer(map, markers, options);
 
 					console.log(markerCluster.getTotalClusters());
+					//Toggle off markerClusters by default
+					toggleMC();
 				}
 			});
 		}
@@ -930,77 +1031,77 @@
    			 return tot
    			}
 
-	</script>
-</head>  
-<body>  
+   		</script>
+   	</head>  
+   	<body>  
 
-	<!--Navigation Bar-->
-	<nav class="navbar navbar-static-top navbar-default" style="text-align:center;background-color:rgb(255,255,255);margin:0px">
-		<div class="container-fluid">
-			<ul class="nav navbar-nav" style="text-align:center;display:inline-block;float:none">
-				<li><a href="../index.html">Home</a></li>
-				<li class="dropdown">
-					<a class="dropdown-toggle" data-toggle="dropdown" href="#">My Projects
-						<span class="caret"></span>
-					</a>
-					<ul class="dropdown-menu">
-						<li><a href="../globalTimezones/globalTimezones.html">Global Timezones</a></li>
-						<li><a href="../dogBreedFinder/dogBreedFinder.html">Dog Breed Finder</a></li>
-						<li><a href="#">Popular Locations Tech Demo</a></li>
-					</ul>
-				</li>
-				<li data-toggle="modal" data-target="#contactModal"><a href="#">Contact</a></li>
-				<li><a href="../Matthew_Antosiak.pdf">Resume</a></li>
-			</ul>
-			<ul class="nav navbar-nav navbar-right">
-				<li data-toggle="modal" data-target="#aboutModal"><a href="#">About</a></li>
-			</ul>
-		</div>
-	</nav>
-	<!--Contact Modal-->
-	<div id="contactModal" class="modal fade" fole="dialog">
-		<div class="modal-dialog modal-sm">
-			<!--Modal Content-->
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title">Contact</h4>
-				</div>
-				<div class="modal-body">
-					<span><strong>Cell Phone:</strong>  650-380-6982 </span><br>
-					<span><strong>Email:</strong> matthewaantosiak@gmail.com</span>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!--About Modal-->
-	<div id="aboutModal" class="modal fade" fole="dialog">
-		<div class="modal-dialog modal-lg">
-			<!--Modal Content-->
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title">About</h4>
-				</div>
-				<div class="modal-body">
-					<span><strong>About this project:</strong><br> The ultimate goal of this project is create a webpage that will show the most popular locations to travel to around the world. You'll be able to enter in a city from any country at any time of the year and know what places you should visit and what local events are happening.</span><br><br>
-					
-					<span><strong>Technical Overview:</strong><br> This project uses flickr to obtain hundreds of thousands of picture locations. Each picture has a latitude, longitude, and date in which it was taken. A local python script uses the flickr api to create JSON files of picture locations. The user specifies a month of a given year and then what city they want displayed. The corresponding JSON file is read and the locations are mapped using the google maps api. A heatmap layer is then applied to the map so it's easier to see where the most activity is.</span>
+   		<!--Navigation Bar-->
+   		<nav class="navbar navbar-static-top navbar-default" style="text-align:center;background-color:rgb(255,255,255);margin:0px">
+   			<div class="container-fluid">
+   				<ul class="nav navbar-nav" style="text-align:center;display:inline-block;float:none">
+   					<li><a href="../index.html">Home</a></li>
+   					<li class="dropdown">
+   						<a class="dropdown-toggle" data-toggle="dropdown" href="#">My Projects
+   							<span class="caret"></span>
+   						</a>
+   						<ul class="dropdown-menu">
+   							<li><a href="../globalTimezones/globalTimezones.html">Global Timezones</a></li>
+   							<li><a href="../dogBreedFinder/dogBreedFinder.html">Dog Breed Finder</a></li>
+   							<li><a href="#">Popular Locations Tech Demo</a></li>
+   						</ul>
+   					</li>
+   					<li data-toggle="modal" data-target="#contactModal"><a href="#">Contact</a></li>
+   					<li><a href="../Matthew_Antosiak.pdf">Resume</a></li>
+   				</ul>
+   				<ul class="nav navbar-nav navbar-right">
+   					<li data-toggle="modal" data-target="#aboutModal"><a href="#">About</a></li>
+   				</ul>
+   			</div>
+   		</nav>
+   		<!--Contact Modal-->
+   		<div id="contactModal" class="modal fade" fole="dialog">
+   			<div class="modal-dialog modal-sm">
+   				<!--Modal Content-->
+   				<div class="modal-content">
+   					<div class="modal-header">
+   						<button type="button" class="close" data-dismiss="modal">&times;</button>
+   						<h4 class="modal-title">Contact</h4>
+   					</div>
+   					<div class="modal-body">
+   						<span><strong>Cell Phone:</strong>  650-380-6982 </span><br>
+   						<span><strong>Email:</strong> matthewaantosiak@gmail.com</span>
+   					</div>
+   					<div class="modal-footer">
+   						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+   					</div>
+   				</div>
+   			</div>
+   		</div>
+   		<!--About Modal-->
+   		<div id="aboutModal" class="modal fade" fole="dialog">
+   			<div class="modal-dialog modal-lg">
+   				<!--Modal Content-->
+   				<div class="modal-content">
+   					<div class="modal-header">
+   						<button type="button" class="close" data-dismiss="modal">&times;</button>
+   						<h4 class="modal-title">About</h4>
+   					</div>
+   					<div class="modal-body">
+   						<span><strong>About this project:</strong><br> The ultimate goal of this project is create a webpage that will show the most popular locations to travel to around the world. You'll be able to enter in a city from any country at any time of the year and know what places you should visit and what local events are happening.</span><br><br>
 
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-				</div>
-			</div>
-		</div>
-	</div>
+   						<span><strong>Technical Overview:</strong><br> This project uses flickr to obtain hundreds of thousands of picture locations. Each picture has a latitude, longitude, and date in which it was taken. A local python script uses the flickr api to create JSON files of picture locations. The user specifies a month of a given year and then what city they want displayed. The corresponding JSON file is read and the locations are mapped using the google maps api. A heatmap layer is then applied to the map so it's easier to see where the most activity is.</span>
+
+   					</div>
+   					<div class="modal-footer">
+   						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+   					</div>
+   				</div>
+   			</div>
+   		</div>
 
 
 
-	<div id="googleMap" style="width:100%;height:80%;"></div>
+   		<div id="googleMap" style="width:100%;height:80%;"></div>
 
 	<!--<label for="placeToFind">Enter a place on the map to be populated by photo geolocations:</label>
 	<input type="text" placeholder="continent, country, region, locality, or neighborhood" class="form-control" id="placeToFind">
