@@ -21,6 +21,12 @@
 			font-family: "Bree Serif";
 		}
 
+		.center-block {
+			display: block;
+			margin-left: auto;
+			margin-right: auto;
+		}
+
 	</style>  
 
 	<!--flickr API Script-->
@@ -839,13 +845,78 @@ return
 			return*/
 		}
 
-		/**Google API Script**/
-		var myCenter = new google.maps.LatLng(51.508742,-0.120850);
-		var map;
-		var markers = [];
-		var heatMapData = [];
-		var heatmap;
-		var zoom = 5;
+      /**
+       * The CenterControl adds a control to the map that recenters the map on
+       * Chicago.
+       * This constructor takes the control DIV as an argument.
+       * @constructor
+       */
+       function CenterControl(controlDiv, map) {
+
+        // Set CSS for the control border.
+        var controlUI = document.createElement('div');
+        controlUI.style.backgroundColor = '#fff';
+        controlUI.style.border = '2px solid #fff';
+        controlUI.style.borderRadius = '3px';
+        controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+        controlUI.style.cursor = 'pointer';
+        controlUI.style.marginBottom = '22px';
+        controlUI.style.textAlign = 'center';
+        controlUI.title = 'Click to recenter the map';
+        controlDiv.appendChild(controlUI);
+
+        // Set CSS for the control interior.
+        var controlText = document.createElement('div');
+        controlText.style.color = 'rgb(25,25,25)';
+        controlText.style.fontFamily = 'Bree Serif';
+        controlText.style.fontSize = '16px';
+        controlText.style.lineHeight = '38px';
+        controlText.style.paddingLeft = '5px';
+        controlText.style.paddingRight = '5px';
+        controlText.innerHTML = 'Toggle Full Screen';
+        controlUI.appendChild(controlText);
+
+        //Bool value to keep track of controlPanel state
+        var mapFullScreen = false;
+
+        // Setup the click event listeners: simply set the map to Chicago.
+        controlUI.addEventListener('click', function() {
+        	console.log("fullscreen btn clicked");
+
+        	if(!mapFullScreen) {
+        		mapFullScreen = true;
+           		//map.setCenter(chicago);
+           		$("#controlPanel").slideUp("slow");
+           		$("#navbar").slideUp("slow"); 
+           		$("#googleMap").css(
+           		{
+           			height: "100%",
+           			width: "100%"
+           		});
+          		//Force the map to redraw to the new size
+          		google.maps.event.trigger(map,'resize');
+          	}
+          	else {
+          		mapFullScreen = false;
+          		$("#controlPanel").slideDown("slow");       		
+          		$("#navbar").slideDown("slow");
+          		$("#googleMap").css(
+          		{
+          			height: "80%",
+          			width: "100%"
+          		});      		
+          	}
+          });
+
+    }
+
+    /**Google API Script**/
+    var myCenter = new google.maps.LatLng(51.508742,-0.120850);
+    var map;
+    var markers = [];
+    var heatMapData = [];
+    var heatmap;
+    var zoom = 5;
 		//Variable to keep track if the displayBtn was attempted to be disabled
 		//Simply disabling the btn without a callback system doesn't actually disable it
 		var displayBtnDisabled = false;
@@ -864,17 +935,25 @@ return
     			//Enable the button once the map goes idle
     			document.getElementById("displayBtn").disabled = false;
     		});*/
-    	}
+        // Create the DIV to hold the control and call the CenterControl()
+        // constructor passing in this DIV.
+        var centerControlDiv = document.createElement('div');
+        var centerControl = new CenterControl(centerControlDiv, map);
 
-    	function showMarkers() {
-    		console.log("showMarkers called, length: " + markers.length);
-    		for(var i = 0; i < markers.length; i++) {
-    			console.log(i);
-    			markers[i].setMap(map);
-    		}
-    	}
+        centerControlDiv.index = 1;
+        map.controls[google.maps.ControlPosition.TOP_RIGHT].push(centerControlDiv);
 
-    	function toggleMarkers() {
+    }
+
+    function showMarkers() {
+    	console.log("showMarkers called, length: " + markers.length);
+    	for(var i = 0; i < markers.length; i++) {
+    		console.log(i);
+    		markers[i].setMap(map);
+    	}
+    }
+
+    function toggleMarkers() {
     		//disable btn
     		document.getElementById("markerToggle").disabled = true;
 
@@ -1069,12 +1148,21 @@ return
    			 return tot
    			}
 
+   			function myButton(){
+   				var btn = $('<div class="my-button"></div>');
+   				btn.bind('click', function(){
+        		// logic here...
+        		alert('button clicked!');
+        	});
+   				return btn[0];
+   			}
+
    		</script>
    	</head>  
    	<body>  
 
    		<!--Navigation Bar-->
-   		<nav class="navbar navbar-static-top navbar-default" style="text-align:center;background-color:rgb(255,255,255);margin:0px">
+   		<nav id="navbar" class="navbar navbar-static-top navbar-default" style="text-align:center;background-color:rgb(255,255,255);margin:0px">
    			<div class="container-fluid">
    				<ul class="nav navbar-nav" style="text-align:center;display:inline-block;float:none">
    					<li><a href="../index.html">Home</a></li>
@@ -1147,14 +1235,19 @@ return
 	<input type="number" min="0" placeholder="Default 250" class="form-control" id="numberOfHits">
 -->
 
-<b style="float:right" id="numDisplayed"></b>
-<b style="float:right">Number of geolocations displayed:</b>
 
-<center>
-	<button class="btn btn-danger" id="markerToggle" onclick="toggleMarkers()">Toggle Markers</button>
-	<button class="btn btn-danger" id="heatmapToggle" onclick="toggleHeatmap()">Toggle Heatmap</button>
-	<button class="btn btn-danger" id="changeGradient" onclick="changeGradient()">Change Gradient</button>
-	<button class="btn btn-danger" id="toggleMC" onclick="toggleMC()">Toggle Marker Cluster</button>
+
+
+<div class="container" id="controlPanel">
+
+	<!--Number of geo locations displayed-->
+	<b style="float:right" id="numDisplayed"></b>
+	<b style="float:right">Number of geolocations displayed:</b>
+
+	<!--Top btns-->
+	<center>
+		<button class="btn btn-danger" id="markerToggle" onclick="toggleMarkers()">Toggle Markers</button>
+		<button class="btn btn-danger" id="toggleMC" onclick="toggleMC()">Toggle Marker Cluster</button>
 
 <!--
 	<button class="btn btn-danger" id="changeRadius" onclick="changeRadius()">Change Radius</button>
@@ -1162,13 +1255,11 @@ return
 	<button class="btn btn-danger" id="changeIntensity" onclick="changeIntensity()">Change Intensity</button>
 -->
 <p id="retStatement"></p>
-
 </center>
 
-
-<div class="container">
+<!--Place Selection dropdowns-->
+<div class="container" style="margin:5px">
 	<div class="row col-sm-12">
-
 		<!--Place Dropdown-->
 		<div class="dropup col-sm-3" style="text-align:center;padding:2px">
 			<button id="place" class="btn btn-primary btn-lg btn-block dropdown-toggle" type="button" data-toggle="dropdown">Place
@@ -1205,33 +1296,44 @@ return
 		</div>
 	</div>
 
-</div>
+	<!--Heatmap controls-->
+	<div class="container center-block">
+		<div class="well col-sm-12" id="heatmapControls" style="padding:0px">
+			<div class="col-sm-12" style="margin:5px">
+				<center>
+					<strong style="font-size:20px;margin:5px">Heatmap Controls</strong>
+				</center>
+			</div>
+			<div class="row col-sm-12" style="padding:5px; text-align:center">
+				<div class="col-sm-4 col-sm-offset-1" style="text-align:center">
+					<button class="btn btn-success" style='margin:5px' id="heatmapToggle" onclick="toggleHeatmap()">Toggle Heatmap</button>
+					<button class="btn btn-success" style='margin:5px' id="changeGradient" onclick="changeGradient()">Change Gradient</button>
+				</div>
 
+				<div class="col-sm-2">
+					<strong>Intensity:</strong>
+					<strong id="intensityVal">10</strong>
+					<input id="intensityRange" type="range" min="1" max="100" value="10" onchange="changeIntensity()">
+				</div>
 
-<div class="container">
-	<div class="well col-sm-12">
-		<div class="col-sm-4">
-			<strong>Intensity:</strong>
-			<strong id="intensityVal">10</strong>
-			<input id="intensityRange" type="range" min="1" max="100" value="10" onchange="changeIntensity()">
-		</div>
+				<div class="col-sm-2">
+					<strong>Radius:</strong>
+					<strong id="radiusVal">5</strong>
+					<input id="radiusRange" type="range" min="1" max="30" value="5" onchange="changeRadius()">
+				</div>
 
-		<div class="col-sm-4">
-			<strong>Radius:</strong>
-			<strong id="radiusVal">5</strong>
-			<input id="radiusRange" type="range" min="1" max="30" value="5" onchange="changeRadius()">
-		</div>
-
-		<div class="col-sm-4">
-			<strong>Opacity</strong>
-			<strong id="opacityVal">1</strong>
-			<input id="opacityRange" step="0.1" type="range" min="0" max="1" value="1" onchange="changeOpacity()">
+				<div class="col-sm-2">
+					<strong>Opacity</strong>
+					<strong id="opacityVal">1</strong>
+					<input id="opacityRange" step="0.1" type="range" min="0" max="1" value="1" onchange="changeOpacity()">
+				</div>
+			</div>
 		</div>
 	</div>
-</div>
 
-<!--<p id="filesReturned"></p>-->
-<p id="filesReturned" style="display:none"></p> 
+	<!--<p id="filesReturned"></p>-->
+	<p id="filesReturned" style="display:none"></p> 
+</div>
 
 </body>  
 </html>  
