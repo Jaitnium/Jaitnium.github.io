@@ -895,9 +895,9 @@ return
 
 			heatmap = new google.maps.visualization.HeatmapLayer({
 				data: heatMapData,
-				radius: 10,
-				opacity: 1.0,
-				maxIntensity: 10
+				radius: document.getElementById('radiusRange').value,
+				opacity: document.getElementById('opacityRange').value,
+				maxIntensity: document.getElementById('intensityRange').value
 			});
 		}
 
