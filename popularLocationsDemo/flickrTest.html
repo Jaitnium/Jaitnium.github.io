@@ -551,8 +551,8 @@
 					console.log("Month directory " + json.children[placeIndex].children[yearIndex].children[monthIndex].name + " found.")
 				}
 			});
-			return
-		}
+return
+}
 
 		//Called when a place is selected from the dropdown list
 		//Set the place dropdown button's text to the name of the place selected
@@ -702,6 +702,14 @@
 
 					//Set center
 					map.setCenter(new google.maps.LatLng(avgCenter.avgLat, avgCenter.avgLong));
+
+					//Set bounds so google maps' zoom encompasses all markers
+					var bounds = new google.maps.LatLngBounds();
+					for (var i = 0; i < markers.length; i++) {
+						bounds.extend(markers[i].getPosition());
+					}
+
+					map.fitBounds(bounds);
 
 					//Set markerCluster
 					var options = {
