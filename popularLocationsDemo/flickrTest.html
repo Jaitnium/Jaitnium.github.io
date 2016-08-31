@@ -695,9 +695,6 @@ return
 					//Show heatmap by default
 					heatmap.setMap(map);
 
-					/*Enable button*/
-					document.getElementById("displayBtn").disabled = false;
-
 					console.log("Retruning with center: " + avgCenter);
 
 					//Set center
@@ -722,6 +719,19 @@ return
 					console.log(markerCluster.getTotalClusters());
 					//Toggle off markerClusters by default
 					toggleMC();
+
+					//Set a callback to enable the btn so the user can't spam the btn
+					/*setTimeout(function() {
+						//Enable btn
+						displayBtnDisabled = false
+						document.getElementById("displayBtn").disabled = false;
+					}, 500)*/
+					google.maps.event.addListenerOnce(map, 'idle', function() {
+						console.log('Map is now idle');
+						/*console.log(map.getCenter());*/
+						displayBtnDisabled = false;
+						document.getElementById("displayBtn").disabled = false;
+					});
 				}
 			});
 		}
@@ -730,6 +740,23 @@ return
 			/*Disable "Display Locations" btn until done*/
 			console.log("disabling btn");
 			document.getElementById("displayBtn").disabled = true;
+
+			//If the disabled flag isn't set
+			if(displayBtnDisabled == false) {
+				//Call the timeout to give the disable to work and return
+				setTimeout(function() {
+					//Should be disabled by now, so set to true and try again
+					displayBtnDisabled = true;
+					readJSONFiles(year, month, place);
+					//Return
+					return;
+				}, 200)
+				return;
+			}
+			
+
+
+
 			/*Clear any other markers that exist*/
 			clearMarkers();
 			clearHeatMap();
@@ -819,6 +846,9 @@ return
 		var heatMapData = [];
 		var heatmap;
 		var zoom = 5;
+		//Variable to keep track if the displayBtn was attempted to be disabled
+		//Simply disabling the btn without a callback system doesn't actually disable it
+		var displayBtnDisabled = false;
 
 		function initialize() {
 			var mapProp = {
@@ -1188,8 +1218,8 @@ return
 
 		<div class="col-sm-4">
 			<strong>Radius:</strong>
-			<strong id="radiusVal">10</strong>
-			<input id="radiusRange" type="range" min="1" max="30" value="10" onchange="changeRadius()">
+			<strong id="radiusVal">5</strong>
+			<input id="radiusRange" type="range" min="1" max="30" value="5" onchange="changeRadius()">
 		</div>
 
 		<div class="col-sm-4">
