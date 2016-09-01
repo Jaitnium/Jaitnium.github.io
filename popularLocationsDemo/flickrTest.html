@@ -17,10 +17,6 @@
 			text-align: center;
 		}
 
-		.well {
-			margin-bottom: 0px;
-		}
-
 		body {
 			font-family: "Bree Serif";
 		}
@@ -51,7 +47,6 @@
 			/*"&user_id=" + user_id +*/
 			"&format=json" +
 			"&nojsoncallback=1";
-
 
 			//console.log("args: " + arguments.length);
 
@@ -1250,10 +1245,8 @@ return
 
 	<!--Place Selection dropdowns-->
 	<div class="container">
-		<div class="row col-sm-12" style="margin-bottom:0px;margin-top:0px">
-
-
-			<div class="well col-sm-8">
+		<div class="row col-sm-12">
+			<div class="well col-sm-8" style="margin-bottom:0px">
 				<!--Place Dropdown-->
 				<div class="dropup col-sm-3" style="text-align:center;padding-left:0px;padding-right:0px">
 					<button id="place" class="btn btn-primary btn-lg btn-block dropdown-toggle" type="button" data-toggle="dropdown" style="font-size:13px">Place
@@ -1289,7 +1282,7 @@ return
 					</div>
 				</div>
 				<!--Top row of control panel-->
-				<div class="well col-sm-4">
+				<div class="well col-sm-4" style="margin-bottom:0px">
 					<div class="col-sm-6" style="text-align:center;padding-left:0px;padding-right:0px">
 						<button class="btn btn-danger btn-lg btn-block" id="markerToggle" onclick="toggleMarkers()" style="font-size:13px">Toggle Markers</button>
 					</div>
