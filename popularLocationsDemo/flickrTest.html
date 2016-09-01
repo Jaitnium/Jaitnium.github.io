@@ -690,22 +690,10 @@ return
 
 					$("#numDisplayed").text(json.photos.photo.length);
 
-					makeHeatMap();
-					//Show heatmap by default
-					heatmap.setMap(map);
-
 					console.log("Retruning with center: " + avgCenter);
 
 					//Set center
 					map.setCenter(new google.maps.LatLng(avgCenter.avgLat, avgCenter.avgLong));
-
-					//Set bounds so google maps' zoom encompasses all markers
-					var bounds = new google.maps.LatLngBounds();
-					for (var i = 0; i < markers.length; i++) {
-						bounds.extend(markers[i].getPosition());
-					}
-
-					map.fitBounds(bounds);
 
 					//Set markerCluster
 					var options = {
@@ -766,10 +754,30 @@ return
 			fileName = place + "_" + month + "_" + year + ".json";
 			//Populate map with data point
 			//readJSONFile('mapData/' + year + "/" + month + "/" + fileName);
+
+			//Turn off the heat map
+			heatMapOff();
+
 			readJSONFile('mapData/' + place + "/" + year + "/" + month + "/" + fileName);
 
+			makeHeatMap();
+			//Show heatmap by default
+			heatmap.setMap(map);
 			//toggleMarkers();
 
+			//Set bounds so google maps' zoom encompasses all markers
+			var bounds = new google.maps.LatLngBounds();
+			for (var i = 0; i < markers.length; i++) {
+				bounds.extend(markers[i].getPosition());
+			}
+
+			//Set the map's zoom
+			map.fitBounds(bounds);
+			zoomLv = map.getZoom();
+			map.setZoom(zoomLv + 1);
+
+			//Now enable toggle buttons
+			enableToggleButtons();
 			//setMapCenter(place);
 
 			/*
@@ -959,6 +967,14 @@ return
     			document.getElementById("markerToggle").disabled = false;
     		});
 
+    		//Alter the marker button's text
+    		if($("#markerToggle").text() == "Hide Markers") {
+    			$("#markerToggle").text("Show Markers");
+    		}
+    		else {
+     			$("#markerToggle").text("Hide Markers");   			
+    		}
+
     		 console.log(markers.length)
     		 for(var i = 0; i < markers.length; i++) {
     		 	if(markers[i].getMap() == null) {
@@ -1006,10 +1022,27 @@ return
 			});
 		}
 
+		//Helper function for readJSONFiles
+		//Turning off the heatmap before setting the zoom prevents lag
+		function heatMapOff() {
+			//If heatmap is defined
+			if(heatmap != null) {
+				heatmap.setMap(null);
+			}
+		}
+
 		function toggleHeatmap() {
 
     		//disable btn
     		document.getElementById("heatmapToggle").disabled = true;
+
+    		//Toggle heatmap btn's text
+    		if($("#heatmapToggle").text() == "Hide Heatmap") {
+    			$("#heatmapToggle").text("Show Heatmap");
+    		}
+    		else {
+    			$("#heatmapToggle").text("Hide Heatmap");
+    		}
 
     		 //Have google maps enable the btn once it goes idle
     		 google.maps.event.addListenerOnce(map, 'idle', function() {
@@ -1031,6 +1064,14 @@ return
     	function toggleMC() {
     		//console.log(markerCluster.getTotalMarkers())
 
+    		//Toggle marker cluster's text
+     		if($("#toggleMC").text() == "Hide Clusters") {
+    			$("#toggleMC").text("Show Clusters");
+    		}
+    		else {
+    			$("#toggleMC").text("Hide Heatmap");
+    		}   		
+
     		if(markerCluster.getTotalMarkers() == 0) {
     			console.log("Creating markerClusters..")
     			//console.log(markerCluster.getTotalMarkers())
@@ -1041,7 +1082,7 @@ return
 				};
 
 				markerCluster = new MarkerClusterer(map, markers, options);
-				markerCluster.redraw();
+				//markerCluster.redraw();
 			}
 			else {
 				console.log("Clearing markerClusters...")
@@ -1093,10 +1134,32 @@ return
 
 		google.maps.event.addDomListener(window, 'load', initialize);
 
+		//Enable the buttons and also set their values to their defaults
+		function enableToggleButtons() {
+			$("#markerToggle").prop("disabled", false);
+			$("#markerToggle").text("Show Markers")
+
+			$("#toggleMC").prop("disabled", false);
+			$("#toggleMC").text("Show Clusters");
+
+			$("#heatmapToggle").prop("disabled", false);
+			$("#heatmapToggle").text("Hide Heatmap");
+
+			$("#changeGradient").prop("disabled", false);
+		}
+
+		function disableToggleButtons() {
+			$("#markerToggle").prop("disabled", true);
+			$("#toggleMC").prop("disabled", true);
+			$("#heatmapToggle").prop("disabled", true);
+			$("#changeGradient").prop("disabled", true);
+		}
 
 		$(document).ready(function() {
 			//Set Place dropdown to the available places
 			setPlaceDropdown();
+			//Keep disabled until a JSON file is loaded
+			disableToggleButtons();
 		})
 
 		googleMapsLoaded = false;
@@ -1284,11 +1347,11 @@ return
 				<!--Top row of control panel-->
 				<div class="well col-sm-4" style="margin-bottom:0px">
 					<div class="col-sm-6" style="text-align:center;padding-left:0px;padding-right:0px">
-						<button class="btn btn-danger btn-lg btn-block" id="markerToggle" onclick="toggleMarkers()" style="font-size:13px">Toggle Markers</button>
+						<button class="btn btn-danger btn-lg btn-block" id="markerToggle" onclick="toggleMarkers()" style="font-size:13px">Show Markers</button>
 					</div>
 
 					<div class="col-sm-6" style="text-align:center;padding-left:0px;padding-right:0px">
-						<button class="btn btn-danger btn-lg btn-block" id="toggleMC" onclick="toggleMC()" style="font-size:13px">Toggle Clusters</button>
+						<button class="btn btn-danger btn-lg btn-block" id="toggleMC" onclick="toggleMC()" style="font-size:13px">Show Clusters</button>
 					</div>
 				</div>
 			</div>
@@ -1297,7 +1360,7 @@ return
 			<div class="row col-sm-12">
 				<div class="well col-sm-12" id="heatmapControls">
 					<div class="col-sm-3" style="text-align:center;padding-left:0px;padding-right:0px">
-						<button class="btn btn-success btn-lg btn-block" id="heatmapToggle" onclick="toggleHeatmap()" style="font-size:13px">Toggle Heatmap</button>
+						<button class="btn btn-success btn-lg btn-block" id="heatmapToggle" onclick="toggleHeatmap()" style="font-size:13px">Hide Heatmap</button>
 					</div>
 					<div class="col-sm-3" style="text-align:center;padding-left:0px;padding-right:0px">
 						<button class="btn btn-success btn-lg btn-block" id="changeGradient" onclick="changeGradient()" style="font-size:13px">Change Gradient</button>
