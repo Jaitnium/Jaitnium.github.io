@@ -770,11 +770,12 @@ return
 			for (var i = 0; i < markers.length; i++) {
 				bounds.extend(markers[i].getPosition());
 			}
-
 			//Set the map's zoom
 			map.fitBounds(bounds);
-			zoomLv = map.getZoom();
-			map.setZoom(zoomLv + 1);
+
+			//Zoom in one extra level
+			//zoomLv = map.getZoom();
+			//map.setZoom(zoomLv + 1);
 
 			//Now enable toggle buttons
 			enableToggleButtons();
