@@ -17,14 +17,12 @@
 			text-align: center;
 		}
 
-		body {
-			font-family: "Bree Serif";
+		.well {
+			margin-bottom: 0px;
 		}
 
-		.center-block {
-			display: block;
-			margin-left: auto;
-			margin-right: auto;
+		body {
+			font-family: "Bree Serif";
 		}
 
 	</style>  
@@ -867,13 +865,14 @@ return
 
         // Set CSS for the control interior.
         var controlText = document.createElement('div');
+        controlText.setAttribute("id", "controlBtn")
         controlText.style.color = 'rgb(25,25,25)';
         controlText.style.fontFamily = 'Bree Serif';
-        controlText.style.fontSize = '16px';
+        controlText.style.fontSize = '13px';
         controlText.style.lineHeight = '38px';
         controlText.style.paddingLeft = '5px';
         controlText.style.paddingRight = '5px';
-        controlText.innerHTML = 'Toggle Full Screen';
+        controlText.innerHTML = 'Hide Controls';
         controlUI.appendChild(controlText);
 
         //Bool value to keep track of controlPanel state
@@ -887,7 +886,8 @@ return
         		mapFullScreen = true;
            		//map.setCenter(chicago);
            		$("#controlPanel").slideUp("slow");
-           		$("#navbar").slideUp("slow"); 
+           		$("#navbar").slideUp("slow");
+           		$("#controlBtn").text("Show Controls");
            		$("#googleMap").css(
            		{
            			height: "100%",
@@ -900,6 +900,7 @@ return
           		mapFullScreen = false;
           		$("#controlPanel").slideDown("slow");       		
           		$("#navbar").slideDown("slow");
+          		$("#controlBtn").text("Hide Controls");
           		$("#googleMap").css(
           		{
           			height: "80%",
@@ -941,7 +942,7 @@ return
         var centerControl = new CenterControl(centerControlDiv, map);
 
         centerControlDiv.index = 1;
-        map.controls[google.maps.ControlPosition.TOP_RIGHT].push(centerControlDiv);
+        map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(centerControlDiv);
 
     }
 
@@ -1238,102 +1239,102 @@ return
 
 
 
-<div class="container" id="controlPanel">
-
-	<!--Number of geo locations displayed-->
-	<b style="float:right" id="numDisplayed"></b>
-	<b style="float:right">Number of geolocations displayed:</b>
+<div class="container-fluid" id="controlPanel">
 
 	<!--Top btns-->
 	<center>
-		<button class="btn btn-danger" id="markerToggle" onclick="toggleMarkers()">Toggle Markers</button>
-		<button class="btn btn-danger" id="toggleMC" onclick="toggleMC()">Toggle Marker Cluster</button>
+		<!--Number of geo locations displayed-->
+		<b>Number of geolocations displayed:</b>
+		<b id="numDisplayed">0</b>
+	</center>
 
-<!--
-	<button class="btn btn-danger" id="changeRadius" onclick="changeRadius()">Change Radius</button>
-	<button class="btn btn-danger" id="changeOpacity" onclick="changeOpacity()">Change Opacity</button>
-	<button class="btn btn-danger" id="changeIntensity" onclick="changeIntensity()">Change Intensity</button>
--->
-<p id="retStatement"></p>
-</center>
+	<!--Place Selection dropdowns-->
+	<div class="container">
+		<div class="row col-sm-12" style="margin-bottom:0px;margin-top:0px">
 
-<!--Place Selection dropdowns-->
-<div class="container" style="margin:5px">
-	<div class="row col-sm-12">
-		<!--Place Dropdown-->
-		<div class="dropup col-sm-3" style="text-align:center;padding:2px">
-			<button id="place" class="btn btn-primary btn-lg btn-block dropdown-toggle" type="button" data-toggle="dropdown">Place
-				<span class="caret"></span>
-			</button>
-			<ul id="placeDDList" class="dropdown-menu"></ul>
-		</div>
 
-		<!--Year Dropdown-->
-		<div class="dropup col-sm-3" style="text-align:center;padding:2px">
-			<button id="year" class="btn btn-primary btn-lg btn-block dropdown-toggle" type="button" data-toggle="dropdown">Year
-				<span class="caret">
-				</span>
-			</button>
-			<ul id="yearDDList" class="dropdown-menu">
-			</ul>
-		</div>
+			<div class="well col-sm-8">
+				<!--Place Dropdown-->
+				<div class="dropup col-sm-3" style="text-align:center;padding-left:0px;padding-right:0px">
+					<button id="place" class="btn btn-primary btn-lg btn-block dropdown-toggle" type="button" data-toggle="dropdown" style="font-size:13px">Place
+						<span class="caret"></span>
+					</button>
+					<ul id="placeDDList" class="dropdown-menu"></ul>
+				</div>
 
-		<!--Month Dropdown-->
-		<div class="dropup col-sm-3" style="text-align:center;padding:2px">
-			<button id="month" class="btn btn-primary btn-lg btn-block dropdown-toggle" type="button" data-toggle="dropdown">Month
-				<span class="caret"></span></button>
-				<ul id="monthDDList" class="dropdown-menu dropdown-menu-right">
-					<!--<li><a href="javascript:void(0);" onclick="filterClick('#month', $(this).text() )">January</a></li>-->
-				</ul>
+				<!--Year Dropdown-->
+				<div class="dropup col-sm-3" style="text-align:center;padding-left:0px;padding-right:0px">
+					<button id="year" class="btn btn-primary btn-lg btn-block dropdown-toggle" type="button" data-toggle="dropdown" style="font-size:13px">Year
+						<span class="caret">
+						</span>
+					</button>
+					<ul id="yearDDList" class="dropdown-menu">
+					</ul>
+				</div>
+
+				<!--Month Dropdown-->
+				<div class="dropup col-sm-3" style="text-align:center;padding-left:0px;padding-right:0px">
+					<button id="month" class="btn btn-primary btn-lg btn-block dropdown-toggle" type="button" data-toggle="dropdown" style="font-size:13px">Month
+						<span class="caret"></span></button>
+						<ul id="monthDDList" class="dropdown-menu dropdown-menu-right">
+							<!--<li><a href="javascript:void(0);" onclick="filterClick('#month', $(this).text() )">January</a></li>-->
+						</ul>
+					</div>
+
+					<!--Display Locations from JSON file btn-->
+					<div class="col-sm-3" style="padding-left:0px;padding-right:0px">
+						<center>
+							<button id="displayBtn" class="btn btn-warning btn-lg btn-block" type="button" onclick="readJSONFiles($('#year').text(), $('#month').text(), $('#place').text())" style="font-size:13px">Display</button>
+						</center>
+					</div>
+				</div>
+				<!--Top row of control panel-->
+				<div class="well col-sm-4">
+					<div class="col-sm-6" style="text-align:center;padding-left:0px;padding-right:0px">
+						<button class="btn btn-danger btn-lg btn-block" id="markerToggle" onclick="toggleMarkers()" style="font-size:13px">Toggle Markers</button>
+					</div>
+
+					<div class="col-sm-6" style="text-align:center;padding-left:0px;padding-right:0px">
+						<button class="btn btn-danger btn-lg btn-block" id="toggleMC" onclick="toggleMC()" style="font-size:13px">Toggle Clusters</button>
+					</div>
+				</div>
 			</div>
 
-			<!--Display Locations from JSON file btn-->
-			<div class="col-sm-3" style="padding:2px">
-				<center>
-					<button id="displayBtn" class="btn btn-warning btn-lg btn-block" type="button" onclick="readJSONFiles($('#year').text(), $('#month').text(), $('#place').text())">Display Locations</button>
-				</center>
+			<!--Heatmap controls-->
+			<div class="row col-sm-12">
+				<div class="well col-sm-12" id="heatmapControls">
+					<div class="col-sm-3" style="text-align:center;padding-left:0px;padding-right:0px">
+						<button class="btn btn-success btn-lg btn-block" id="heatmapToggle" onclick="toggleHeatmap()" style="font-size:13px">Toggle Heatmap</button>
+					</div>
+					<div class="col-sm-3" style="text-align:center;padding-left:0px;padding-right:0px">
+						<button class="btn btn-success btn-lg btn-block" id="changeGradient" onclick="changeGradient()" style="font-size:13px">Change Gradient</button>
+					</div>
+
+					<div class="col-sm-2">
+						<strong>Intensity:</strong>
+						<strong id="intensityVal">5</strong>
+						<input id="intensityRange" type="range" min="1" max="10" value="5" onchange="changeIntensity()">
+					</div>
+
+					<div class="col-sm-2">
+						<strong>Radius:</strong>
+						<strong id="radiusVal">5</strong>
+						<input id="radiusRange" type="range" min="1" max="30" value="5" onchange="changeRadius()">
+					</div>
+
+					<div class="col-sm-2">
+						<strong>Opacity</strong>
+						<strong id="opacityVal">1</strong>
+						<input id="opacityRange" step="0.1" type="range" min="0" max="1" value="1" onchange="changeOpacity()">
+					</div>
+
+				</div>
 			</div>
 		</div>
+
+		<!--<p id="filesReturned"></p>-->
+		<p id="filesReturned" style="display:none"></p> 
 	</div>
-
-	<!--Heatmap controls-->
-	<div class="container center-block">
-		<div class="well col-sm-12" id="heatmapControls" style="padding:0px">
-			<div class="col-sm-12" style="margin:5px">
-				<center>
-					<strong style="font-size:20px;margin:5px">Heatmap Controls</strong>
-				</center>
-			</div>
-			<div class="row col-sm-12" style="padding:5px; text-align:center">
-				<div class="col-sm-4 col-sm-offset-1" style="text-align:center">
-					<button class="btn btn-success" style='margin:5px' id="heatmapToggle" onclick="toggleHeatmap()">Toggle Heatmap</button>
-					<button class="btn btn-success" style='margin:5px' id="changeGradient" onclick="changeGradient()">Change Gradient</button>
-				</div>
-
-				<div class="col-sm-2">
-					<strong>Intensity:</strong>
-					<strong id="intensityVal">10</strong>
-					<input id="intensityRange" type="range" min="1" max="100" value="10" onchange="changeIntensity()">
-				</div>
-
-				<div class="col-sm-2">
-					<strong>Radius:</strong>
-					<strong id="radiusVal">5</strong>
-					<input id="radiusRange" type="range" min="1" max="30" value="5" onchange="changeRadius()">
-				</div>
-
-				<div class="col-sm-2">
-					<strong>Opacity</strong>
-					<strong id="opacityVal">1</strong>
-					<input id="opacityRange" step="0.1" type="range" min="0" max="1" value="1" onchange="changeOpacity()">
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<!--<p id="filesReturned"></p>-->
-	<p id="filesReturned" style="display:none"></p> 
-</div>
 
 </body>  
 </html>  
