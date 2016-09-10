@@ -818,7 +818,7 @@ return
 
 					console.log(markerCluster.getTotalClusters());
 					//Toggle off markerClusters by default
-					//toggleMC();
+					toggleMC();
 
 					//Set a callback to enable the btn so the user can't spam the btn
 					/*setTimeout(function() {
@@ -1056,6 +1056,11 @@ return
         centerControlDiv.index = 1;
         map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(centerControlDiv);
 
+		google.maps.event.addListener(map,'click',function(event) { 
+			console.log(event.latLng.lat() + ', ' + event.latLng.lng())
+		})
+
+
     }
 
     function showMarkers() {
@@ -1081,18 +1086,18 @@ return
     			$("#markerToggle").text("Show Markers");
     		}
     		else {
-     			$("#markerToggle").text("Hide Markers");   			
+    			$("#markerToggle").text("Hide Markers");   			
     		}
 
-    		 console.log(markers.length)
-    		 for(var i = 0; i < markers.length; i++) {
-    		 	if(markers[i].getMap() == null) {
-    		 		markers[i].setMap(map);
-    		 	}
-    		 	else {
-    		 		markers[i].setMap(null);
-    		 	}
-    		 }
+    		console.log(markers.length)
+    		for(var i = 0; i < markers.length; i++) {
+    			if(markers[i].getMap() == null) {
+    				markers[i].setMap(map);
+    			}
+    			else {
+    				markers[i].setMap(null);
+    			}
+    		}
 
     		//Very hacky..
     		//Slightly adjust the center so the idle function triggers
@@ -1173,10 +1178,8 @@ return
     	function toggleMC() {
     		//console.log(markerCluster.getTotalMarkers())
 
-
-
     		//Toggle marker cluster's text
-     		if($("#toggleMC").text() == "Hide Clusters") {
+    		if($("#toggleMC").text() == "Hide Clusters") {
     			$("#toggleMC").text("Show Clusters");
     		}
     		else {
@@ -1284,8 +1287,8 @@ return
 			HSreadJSONFiles(year, month, place);
 
 			map.setZoom(zoom)
-   			tot = markerCluster.getTotalClusters();
-   			console.log(tot)
+			tot = markerCluster.getTotalClusters();
+			console.log(tot)
 
 
 			//Override function to get ALL cluster spots (even outside of viewport)
@@ -1303,17 +1306,16 @@ return
    			 };
 
 
-
    			 google.maps.event.addListenerOnce(map, 'idle', function(){
 			 	//Toggle cluters on
 				//toggleMC();
-   			 	console.log(markers.length)
+				console.log(markers.length)
 
-   			 	console.log("Idle, total clusters: " + markerCluster.getTotalClusters());
-   			 	googleMapsLoaded = true;
-   			 	var clusters = markerCluster.getClusters();
-   			 	var result = "";
-   			 	for(var i = 0; i < clusters.length; i++) {
+				console.log("Idle, total clusters: " + markerCluster.getTotalClusters());
+				googleMapsLoaded = true;
+				var clusters = markerCluster.getClusters();
+				var result = "";
+				for(var i = 0; i < clusters.length; i++) {
     				//console.log(clusters[i].getCenter().lat());
        				//console.log(clusters[i].getCenter().lng());
        				result += i + ": " + clusters[i].getCenter().lat() + " " + clusters[i].getCenter().lng() + "\n";
@@ -1414,7 +1416,7 @@ return
 
 
 
-	<!--<button class="btn btn-primary btn-lg btn-block" onclick="getHotSpotJSON('2015', 'October', 'San Francisco', 15)" type="button">Ghost Sim</button>-->
+<!--<button class="btn btn-primary btn-lg btn-block" onclick="getHotSpotJSON('2015', 'October', 'San Francisco', 15)" type="button">Ghost Sim</button>-->
 
 <div class="container-fluid" id="controlPanel">
 
