@@ -1,3 +1,6 @@
+#Given the path to a JSON file, creates a new JSOn file with the outliers removed
+#The old JSON file is renamed
+
 import os
 import sys
 import json
@@ -228,12 +231,12 @@ def removeOutliers(path):
 def printAllUsage():
     print("Usage: python removeOutliers.py [pathToJSON]")
 
-if(sys.argv[1] == "-u" or sys.argv[1] == "-usage"):
+#Exit if not the correct number of arguments
+if(len(sys.argv) != 2):
     printAllUsage()
     sys.exit(0)
 
-#Exit if not the correct number of arguments
-if(len(sys.argv) != 2):
+if(sys.argv[1] == "-u" or sys.argv[1] == "-usage"):
     printAllUsage()
     sys.exit(0)
 

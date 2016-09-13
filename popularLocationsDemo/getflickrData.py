@@ -1,3 +1,5 @@
+#Uses the flickrapi to create JSON files of the specified places
+
 import flickrapi
 import json
 import sys
@@ -5,6 +7,25 @@ import datetime
 import os
 import textwrap
 import numpy as np
+
+#Given the dictionary of entries retrieved from flickr
+#Return the data without entries at exactly lat, lng: 0, 0
+def removeGarbageEntries(data):
+    i = 0
+    e = 0
+    print("removing garbage entries...")
+    while i < len(data['photos']['photo']):
+        lat = data['photos']['photo'][i]['latitude']
+        lng = data['photos']['photo'][i]['longitude']
+        if(lat == 0 and lng == 0):
+            e += 1
+            data['photos']['photo'].pop(i)
+        else:
+            i += 1
+    print("Removed " + str(e) + " garbage entries")
+
+    return data
+
 
 #"Month" and "Year" query flickr
 #mintakenDate and maxtakenDate are created using the given month and year
@@ -73,6 +94,8 @@ def queryflickrMonth(placeToFind, month, year):
     #Create the fileName based on the arguments
     outputName = placeName + "_" + month + "_" + year + ".json"
 
+    page = removeGarbageEntries(page)
+
     print("Writing to file: " + outputName + " ...")
 
     #Dump into one json file using the name specified
@@ -128,6 +151,8 @@ def queryflickrRaw(placeToFind, mintakenDate, maxuptakenDate, outputName):
 
 
     print("Number of geolocations dumping to file: " + str(len(page['photos']['photo'])))
+
+    page = removeGarbageEntries(page)
 
     print("Writing to file: " + outputName + " ...")
 
