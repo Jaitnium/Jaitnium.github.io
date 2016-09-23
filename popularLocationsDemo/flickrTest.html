@@ -666,17 +666,17 @@ return
 						for(var j = 0; j < clusterArray.length; j++) {
 							element = clusterArray[j]
 
-
 							//Create a new marker
 							var marker=new google.maps.Marker({
 								position: new google.maps.LatLng(element.weightedPoint[0], element.weightedPoint[1])
 							});
-							markerWeights.push(element.density)
+							//markerWeights.push(element.density)
 							//console.log(typeof(json.photos.photo[i].latitude));
 							//Don't show markers by default
 							//marker.setMap(map);
-							markers.push(marker);
 
+							//markers.push(marker);
+							markers.push({marker: marker, density: element.density})
 
                     		//Circle
                     		var myIcon = new google.maps.MarkerImage("http://worldartsme.com/images/clip-art-red-dot-clipart-1.jpg", null, null, null, new google.maps.Size(10,10));
@@ -714,7 +714,7 @@ return
 					//Set bounds so google maps' zoom encompasses all markers
 					var bounds = new google.maps.LatLngBounds();
 					for (var i = 0; i < markers.length; i++) {
-						bounds.extend(markers[i].getPosition());
+						bounds.extend(markers[i].marker.getPosition());
 					}
 					//Set the map's zoom
 					map.fitBounds(bounds);
@@ -734,108 +734,6 @@ return
 						displayBtnDisabled = false;
 						document.getElementById("displayBtn").disabled = false;
 					});
-				}
-			});
-		}
-
-		function readGridJSON(path) {
-			console.log("About to read JSON file..");
-
-			$.ajax({
-				dataType: 'json',
-				url: path,
-				error: function() {
-					//Data points directory doesn't exist
-					console.log("ERROR: couldn't read Grid JSON file '" + path + "'. Exiting...");
-					document.getElementById("displayBtn").disabled = false;
-					return					
-				},
-				success: function(json) {
-					console.log("read JSON file!")
-
-					for(var i = 0; i < json.elements.length; i++) {
-						for(var j = 0; j < json.elements[i].length; j++) {
-                    		//Circle
-                    		var myIcon = new google.maps.MarkerImage("http://worldartsme.com/images/clip-art-red-dot-clipart-1.jpg", null, null, null, new google.maps.Size(10,10));
-
-							//Create a new marker
-							var marker=new google.maps.Marker({
-								icon: myIcon,
-								position: new google.maps.LatLng(json.elements[i][j].weightedPoint[0], json.elements[i][j].weightedPoint[1])
-							});
-
-							markerWeights.push(json.elements[i][j].density)
-
-							//console.log(typeof(json.photos.photo[i].latitude));
-							//Don't show markers by default
-							//marker.setMap(map);
-							markers.push(marker);
-						}
-					}
-					makeGridHeatMap();
-					//Show heatmap by default
-					heatmap.setMap(map);
-					//toggleMarkers();
-
-					//Set bounds so google maps' zoom encompasses all markers
-					var bounds = new google.maps.LatLngBounds();
-					for (var i = 0; i < markers.length; i++) {
-						bounds.extend(markers[i].getPosition());
-					}
-					//Set the map's zoom
-					map.fitBounds(bounds);
-
-					document.getElementById()
-
-					//Zoom in one extra level
-					//zoomLv = map.getZoom();
-					//map.setZoom(zoomLv + 1);
-
-					//Now enable toggle buttons
-					enableToggleButtons();				
-		/*
-					//Create a new marker
-					var marker=new google.maps.Marker({
-						position: new google.maps.LatLng(json.topLeftBound[0], json.topLeftBound[1])
-					});
-
-	
-					markers.push(marker)
-
-					//Create a new marker
-					var marker=new google.maps.Marker({
-						position: new google.maps.LatLng(json.botRightBound[0], json.botRightBound[1])
-					});
-
-					markers.push(marker)
-
-
-					for(var i = 0; i < json.elements.length; i++) {
-						for(var j = 0; j < json.elements[i].length; j++) {
-                    		//Circle
-                    		var myIcon = new google.maps.MarkerImage("http://worldartsme.com/images/clip-art-red-dot-clipart-1.jpg", null, null, null, new google.maps.Size(10,10));
-
-                    		console.log(json.elements[i][j].topLeftBound[0])
-                    		console.log(json.elements[i][j].topLeftBound[1])
-							//Create a new marker
-							var marker=new google.maps.Marker({
-								icon: myIcon,
-								position: new google.maps.LatLng(json.elements[i][j].topLeftBound[0], json.elements[i][j].topLeftBound[1])
-							});
-
-							//console.log(typeof(json.photos.photo[i].latitude));
-							//Don't show markers by default
-							//marker.setMap(map);
-							markers.push(marker);
-
-							//Create a new marker
-							var marker=new google.maps.Marker({
-								position: new google.maps.LatLng(json.elements[i][j].botRightBound[0], json.elements[i][j].botRightBound[1])
-							});
-							markers.push(marker)
-						}
-					}
-					console.log(markers.length)*/
 				}
 			});
 		}
@@ -891,7 +789,7 @@ return
 			//Set bounds so google maps' zoom encompasses all markers
 			var bounds = new google.maps.LatLngBounds();
 			for (var i = 0; i < markers.length; i++) {
-				bounds.extend(markers[i].getPosition());
+				bounds.extend(markers[i].marker.getPosition());
 			}
 			//Set the map's zoom
 			map.fitBounds(bounds);
@@ -1043,7 +941,7 @@ return
     var map;
     var markers = [];
     var heatMapData = [];
-    var markerWeights = [];
+    //var markerWeights = [];
     var clusters = []
     var heatmap;
     var zoom = 5;
@@ -1108,11 +1006,11 @@ return
 
     		console.log(markers.length)
     		for(var i = 0; i < markers.length; i++) {
-    			if(markers[i].getMap() == null) {
-    				markers[i].setMap(map);
+    			if(markers[i].marker.getMap() == null) {
+    				markers[i].marker.setMap(map);
     			}
     			else {
-    				markers[i].setMap(null);
+    				markers[i].marker.setMap(null);
     			}
     		}
 
@@ -1126,7 +1024,7 @@ return
 
     	function clearMarkers() {
     		for(var i = 0; i < markers.length; i++) {
-    			markers[i].setMap(null);
+    			markers[i].marker.setMap(null);
     		}
     		markers = [];
     	}
@@ -1142,7 +1040,7 @@ return
     		console.log("marker length: " + markers.length);
     		for(var i = 0; i < markers.length; i++) {
 				//heatMapData.push(new google.maps.LatLng(markers[i].getPosition().lat(), markers[i].getPosition().lng()));
-				heatMapData.push({location: new google.maps.LatLng(markers[i].getPosition().lat(), markers[i].getPosition().lng()), weight: 1});
+				heatMapData.push({location: new google.maps.LatLng(markers[i].marker.getPosition().lat(), markers[i].marker.getPosition().lng()), weight: markers[i].density});
 			}
 
 			heatmap = new google.maps.visualization.HeatmapLayer({
