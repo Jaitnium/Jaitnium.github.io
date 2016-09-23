@@ -7,6 +7,7 @@ import datetime
 import os
 import textwrap
 import numpy as np
+from shutil import copyfile
 
 #Given the dictionary of entries retrieved from flickr
 #Return the data without entries at exactly lat, lng: 0, 0
@@ -55,6 +56,7 @@ def queryflickrMonth(placeToFind, month, year):
         print("ERROR: Invalid 'placeToFind' string. flickr.places.find returned with an empty array. Exiting...")
         sys.exit(0)
     placeFound = places['places']['place'][0]
+    sys.stdout.flush()
 
     #temp = textwrap.dedent(placeFound['_content']).encode(sys.getdefaultencoding())
     #print(type(placeFound['_content']))
@@ -66,6 +68,7 @@ def queryflickrMonth(placeToFind, month, year):
         print("Found place: " + placeFound['_content'] + " which is of type: " + placeFound['place_type'])
     except UnicodeEncodeError:
     	print("Found place can't be printed because it is in another language..")
+    sys.stdout.flush()
 
     #Get the first page
     page = flickr.photos.search(place_id=placeFound['place_id'], has_geo="1", extras="geo", 
@@ -87,6 +90,7 @@ def queryflickrMonth(placeToFind, month, year):
 
 
     print("Number of geolocations dumping to file: " + str(page['photos']['total']))
+    sys.stdout.flush()
 
     #Correctly get the name of the place by parsing the first part of the returned '_content' field
     placeName = placeFound['_content'].split(",")[0]
@@ -97,6 +101,7 @@ def queryflickrMonth(placeToFind, month, year):
     page = removeGarbageEntries(page)
 
     print("Writing to file: " + outputName + " ...")
+    sys.stdout.flush()
 
     #Dump into one json file using the name specified
     with open(outputName, 'w') as outfile:
@@ -124,11 +129,16 @@ def queryflickrRaw(placeToFind, mintakenDate, maxuptakenDate, outputName):
         sys.exit(0)
     placeFound = places['places']['place'][0]
 
+    sys.stdout.flush()
+
+
     try:
         #Else, let the user know what was found and what we'll be getting data for
         print("Found place: " + placeFound['_content'] + "which is of type: " + placeFound['place_type'])
     except UnicodeEncodeError:
     	print("Found place can't be printed because it is in another language..")
+
+    sys.stdout.flush()
 
 
     #Get the first page
@@ -138,6 +148,7 @@ def queryflickrRaw(placeToFind, mintakenDate, maxuptakenDate, outputName):
     #Get the total number of pages to get
     numPages = page['photos']['pages']
     print(numPages)
+    sys.stdout.flush()
 
     #Until we've fetched each page
     for i in range(2, numPages):
@@ -151,10 +162,12 @@ def queryflickrRaw(placeToFind, mintakenDate, maxuptakenDate, outputName):
 
 
     print("Number of geolocations dumping to file: " + str(len(page['photos']['photo'])))
+    sys.stdout.flush()
 
     page = removeGarbageEntries(page)
 
     print("Writing to file: " + outputName + " ...")
+    sys.stdout.flush()
 
     #Dump into one json file using the name specified
     with open(outputName + ".json", 'w') as outfile:
@@ -266,13 +279,13 @@ def verifyArguments(flag):
 	#Print usage
     if(flag == '-usage'):
         printAllUsage()
-        sys.exit(0)
+        sys.exit(1)
     #Check arguments for "raw" usage
     if(flag == '-r'):
 		#If not the correct number of args, print usage and exit
         if(len(sys.argv) != 6):
             printRawUsage()
-            sys.exit(0)
+            sys.exit(1)
 		#Correct number of args, verify their validity
         else:
             #Check if dates are valid, exit if not
@@ -288,7 +301,7 @@ def verifyArguments(flag):
 		#If not the correct number of args, print usage and exit
         if(len(sys.argv) != 5):
             printMonthUsage()
-            sys.exit(0)
+            sys.exit(1)
 		#Correct number of args, verify their validity
         else:
             #Check if arguments are valid, exit if not
@@ -305,7 +318,7 @@ def verifyArguments(flag):
 		#If not the correct number of args, print usage and exit
         if(len(sys.argv) != 4):
             printYearUsage()
-            sys.exit(0)
+            sys.exit(1)
 		#Correct number of args, verify their validity
         else:
             #Check if the year is valid, exit if not
@@ -320,30 +333,16 @@ def verifyArguments(flag):
     #Any other arguments will cause the check to fail and exit
     else:
         printAllUsage()
-        sys.exit(0)
+        sys.exit(1)
 
-#Create the JSON file corresponding to the arguments and place the file into the correct folder
-#Create the corresponding folder hierarchy if it doesn't exist
-def createMonthJSON(placeToFind, month, year):
 
-    #Query flickr and the fileName that was created
-    fileName = queryflickrMonth(placeToFind, month, year)
-
-    #At this point we have a json file with all geo locations from placeToFind at month-year
-    #Move the file called fileName to the appropriate folder, and create it if it doesn't exist
+def moveToMapData(month, year, fileName):
 
     #Testing directory creation
     path = "./mapData"
     #Create if it doesn't exist
     if not os.path.exists(path):
         os.makedirs(path)
-    
-
-    #Check for year subdirectory
-    #path = "./mapData/" + year
-    #Create if it doesn't exist
-    #if not os.path.exists(path):
-        #os.makedirs(path)
 
     #Parse the name of the place from the returned filename
     #and create a folder with that name if it doesn't exist
@@ -355,15 +354,64 @@ def createMonthJSON(placeToFind, month, year):
     if not os.path.exists(path):
         os.makedirs(path)
 
-    print("fileName: " + fileName)
+    sys.stdout.flush()
+
     #Move the newly created file to the correct directory
     try:
-        os.rename(fileName, path + "/" + fileName)
-    except OSError:
-    	#If the file exists, delete it and move the new file there
+        copyfile(fileName, path + "/" + fileName)
+        #os.rename(fileName, path + "/" + fileName)
+    except IOError:
+        #If the file exists, delete it and move the new file there
         print("File Exists: Overwriting existing file..")
         os.remove(path + "/" + fileName)
-        os.rename(fileName, path + "/" + fileName)
+        copyfile(fileName, path + "/" + fileName)
+
+    sys.stdout.flush()
+
+def moveToRawData(month, year, fileName):
+
+    #Testing directory creation
+    path = "./rawData"
+    #Create if it doesn't exist
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+    #Parse the name of the place from the returned filename
+    #and create a folder with that name if it doesn't exist
+    placeName = fileName.split("_")[0]
+
+    #Check for month subdirectory
+    path = "./rawData/" + placeName + "/" + year + "/" + month
+    #Create if it doesn't exist
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+    sys.stdout.flush()
+
+    #Move the newly created file to the correct directory
+    try:
+        copyfile(fileName, path + "/" + fileName)
+        #os.rename(fileName, path + "/" + fileName)
+    except IOError:
+        #If the file exists, delete it and move the new file there
+        print("File Exists: Overwriting existing file..")
+        os.remove(path + "/" + fileName)
+        copyfile(fileName, path + "/" + fileName)
+
+    sys.stdout.flush()
+
+#Create the JSON file corresponding to the arguments and place the file into the correct folder
+#Create the corresponding folder hierarchy if it doesn't exist
+def createMonthJSON(placeToFind, month, year):
+
+    #Query flickr and the fileName that was created
+    fileName = queryflickrMonth(placeToFind, month, year)
+
+    #At this point we have a json file with all geo locations from placeToFind at month-year
+    #Move the file called fileName to the appropriate folder, and create it if it doesn't exist
+    #moveToMapData(month, year, fileName)
+    moveToRawData(month, year, fileName)
+    os.remove(fileName)
 
 #This function creates a file called "index.json" with the folder structure of the given path
 def createIndexJSON(path):
@@ -606,6 +654,12 @@ def removeOutliers(path):
 #MAIN START
 #outfile is the name of the json file that contains the mapData structure
 outfile = "index.json"
+
+#Exit if not enough args
+if(len(sys.argv) == 1):
+    printAllUsage()
+    sys.exit(1)
+
 #Verify the arguments are valid
 verifyArguments(sys.argv[1])
 
@@ -636,6 +690,10 @@ if(sys.argv[1] == '-m'):
     #Create an index.json that reflects the changes
     with open(outfile, 'w') as outfile:
        json.dump(createIndexJSON('mapData'), outfile, indent=4, sort_keys=True, separators=(',', ':'))
+    print("index.json updated") 
+
+    #Exit Success
+    sys.exit(0)
 
 #If "year" usage
 if(sys.argv[1] == '-y'):
@@ -660,6 +718,10 @@ if(sys.argv[1] == '-y'):
     #Create an index.json that reflects the changes
     with open(outfile, 'w') as outfile:
        json.dump(createIndexJSON('mapData'), outfile, indent=4, sort_keys=True, separators=(',', ':'))
+    print("index.json updated") 
+
+    #Exit Success
+    sys.exit(0)
 
 #If "update index.json" usage
 if(sys.argv[1] == '-ui'):
@@ -667,5 +729,7 @@ if(sys.argv[1] == '-ui'):
     #Create an index.json that reflects the changes
     with open(outfile, 'w') as outfile:
        json.dump(createIndexJSON('mapData'), outfile, indent=4, sort_keys=True, separators=(',', ':'))
+    print("index.json updated")
 
-    print("index.json updated") 
+    #Exit Success
+    sys.exit(0)

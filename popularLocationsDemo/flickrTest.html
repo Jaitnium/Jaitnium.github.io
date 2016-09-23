@@ -644,117 +644,6 @@ return
 			});
 		}
 
-
-		//A modified readJSONFile for the getHotSpotJSON function
-		function HSreadJSONFile(path) {
-			console.log("About to read JSON file..");
-
-			$.ajax({
-				dataType: 'json',
-				url: path,
-				async: false,
-				error: function() {
-					//Data points directory doesn't exist
-					console.log("ERROR: couldn't read JSON file '" + path + "'. Exiting...");
-					document.getElementById("displayBtn").disabled = false;
-					return					
-				},
-				success: function(json) {
-					var avgCenter = {avgLat: 0, avgLong: 0};
-					console.log(json);
-					console.log(json.photos.photo[0]);
-					for(var i = 0; i < json.photos.photo.length; i++) {
-
-                    	//Circle
-                    	var myIcon = new google.maps.MarkerImage("http://worldartsme.com/images/clip-art-red-dot-clipart-1.jpg", null, null, null, new google.maps.Size(10,10));
-
-						//Create a new marker
-						var marker=new google.maps.Marker({
-							icon: myIcon,
-							position: new google.maps.LatLng(json.photos.photo[i].latitude, json.photos.photo[i].longitude)
-						});
-
-						//console.log(avgCenter)
-
-						//Update avgLat and avgLong
-						avgCenter.avgLat += Number(json.photos.photo[i].latitude);
-						avgCenter.avgLong += Number(json.photos.photo[i].longitude);
-
-						//console.log(typeof(json.photos.photo[i].latitude));
-						//Don't show markers by default
-						//marker.setMap(map);
-						markers.push(marker);
-					}
-
-					//Final avgCenter
-					avgCenter.avgLat /= json.photos.photo.length;
-					avgCenter.avgLong /= json.photos.photo.length;
-
-					console.log("Setting center to Lat:" + avgCenter.avgLat + " Lng:" + avgCenter.avgLong)
-
-					$("#numDisplayed").text(json.photos.photo.length);
-
-					console.log("Returning with center: " + avgCenter);
-
-					//Set center
-					map.setCenter(new google.maps.LatLng(avgCenter.avgLat, avgCenter.avgLong));
-
-					//Set markerCluster
-					var options = {
-						imagePath: 'images/m',
-						averageCenter: true
-					};
-
-					markerCluster = new MarkerClusterer(map, markers, options);
-
-					console.log(markerCluster.getTotalClusters());
-					//Toggle off markerClusters by default
-					//toggleMC();
-
-					//Set a callback to enable the btn so the user can't spam the btn
-					/*setTimeout(function() {
-						//Enable btn
-						displayBtnDisabled = false
-						document.getElementById("displayBtn").disabled = false;
-					}, 500)*/
-					google.maps.event.addListenerOnce(map, 'idle', function() {
-						console.log('Map is now idle');
-						/*console.log(map.getCenter());*/
-						displayBtnDisabled = false;
-						document.getElementById("displayBtn").disabled = false;
-					});
-				}
-			});
-		}
-
-		//A modified readJSONFiles for the getHotSpotJSON function
-		function HSreadJSONFiles(year, month, place) {			
-
-			/*Clear any other markers that exist*/
-			clearMarkers();
-			clearHeatMap();
-
-			//year = $('#year').text();
-			//month = $('#month').text();
-			//place = $('#place').text();
-			fileName = place + "_" + month + "_" + year + ".json";
-			//Populate map with data point
-			//readJSONFile('mapData/' + year + "/" + month + "/" + fileName);
-
-			//Turn off the heat map
-			heatMapOff();
-
-			HSreadJSONFile('mapData/' + place + "/" + year + "/" + month + "/" + fileName);
-
-			makeHeatMap();
-			//Show heatmap by default
-			heatmap.setMap(map);
-			//toggleMarkers();
-
-			//Now enable toggle buttons
-			enableToggleButtons();
-		}
-
 		function readJSONFile(path) {
 			console.log("About to read JSON file..");
 
@@ -769,63 +658,76 @@ return
 					return					
 				},
 				success: function(json) {
-					var avgCenter = {avgLat: 0, avgLong: 0};
-					console.log(json);
-					console.log(json.photos.photo[0]);
-					for(var i = 0; i < json.photos.photo.length; i++) {
 
-                    	//Circle
-                    	var myIcon = new google.maps.MarkerImage("http://worldartsme.com/images/clip-art-red-dot-clipart-1.jpg", null, null, null, new google.maps.Size(10,10));
+					console.log("read JSON file!")
 
-						//Create a new marker
-						var marker=new google.maps.Marker({
-							icon: myIcon,
-							position: new google.maps.LatLng(json.photos.photo[i].latitude, json.photos.photo[i].longitude)
-						});
+					for(var i = 0; i < json.clusters.length; i++) {
+						clusterArray = json.clusters[i]['elements']
+						for(var j = 0; j < clusterArray.length; j++) {
+							element = clusterArray[j]
 
-						//console.log(avgCenter)
 
-						//Update avgLat and avgLong
-						avgCenter.avgLat += Number(json.photos.photo[i].latitude);
-						avgCenter.avgLong += Number(json.photos.photo[i].longitude);
+							//Create a new marker
+							var marker=new google.maps.Marker({
+								position: new google.maps.LatLng(element.weightedPoint[0], element.weightedPoint[1])
+							});
+							markerWeights.push(element.density)
+							//console.log(typeof(json.photos.photo[i].latitude));
+							//Don't show markers by default
+							//marker.setMap(map);
+							markers.push(marker);
 
-						//console.log(typeof(json.photos.photo[i].latitude));
-						//Don't show markers by default
-						//marker.setMap(map);
-						markers.push(marker);
+
+                    		//Circle
+                    		var myIcon = new google.maps.MarkerImage("http://worldartsme.com/images/clip-art-red-dot-clipart-1.jpg", null, null, null, new google.maps.Size(10,10));
+							//Create a cluster marker
+							var marker=new google.maps.Marker({
+								icon: myIcon,
+								position: new google.maps.LatLng(json.clusters[i]['weightedPoint'][0], json.clusters[i]['weightedPoint'][1])
+							});			
+							clusters.push(marker)
+						}
 					}
+					/*
+					for(var i = 0; i < json.elements.length; i++) {
+						for(var j = 0; j < json.elements[i].length; j++) {
+                    		//Circle
+                    		var myIcon = new google.maps.MarkerImage("http://worldartsme.com/images/clip-art-red-dot-clipart-1.jpg", null, null, null, new google.maps.Size(10,10));
 
-					//Final avgCenter
-					avgCenter.avgLat /= json.photos.photo.length;
-					avgCenter.avgLong /= json.photos.photo.length;
+							//Create a new marker
+							var marker=new google.maps.Marker({
+								icon: myIcon,
+								position: new google.maps.LatLng(json.elements[i][j].weightedPoint[0], json.elements[i][j].weightedPoint[1])
+							});
 
-					console.log("Setting center to Lat:" + avgCenter.avgLat + " Lng:" + avgCenter.avgLong)
+							markerWeights.push(json.elements[i][j].density)
 
-					$("#numDisplayed").text(json.photos.photo.length);
+							//console.log(typeof(json.photos.photo[i].latitude));
+							//Don't show markers by default
+							//marker.setMap(map);
+							markers.push(marker);
+						}
+					}*/
 
-					console.log("Returning with center: " + avgCenter);
+					//toggleMarkers();
 
-					//Set center
-					map.setCenter(new google.maps.LatLng(avgCenter.avgLat, avgCenter.avgLong));
+					//Set bounds so google maps' zoom encompasses all markers
+					var bounds = new google.maps.LatLngBounds();
+					for (var i = 0; i < markers.length; i++) {
+						bounds.extend(markers[i].getPosition());
+					}
+					//Set the map's zoom
+					map.fitBounds(bounds);
 
-					//Set markerCluster
-					var options = {
-						imagePath: 'images/m',
-						averageCenter: true
-					};
+					$("#numDisplayed").text(json.totalPoints)
+					$("#gridDisplayed").text(markers.length)
+					$("#clustersDisplayed").text(json.clusters.length)
+					//Zoom in one extra level
+					//zoomLv = map.getZoom();
+					//map.setZoom(zoomLv + 1);
 
-					markerCluster = new MarkerClusterer(map, markers, options);
+					//Now enable toggle buttons
 
-					console.log(markerCluster.getTotalClusters());
-					//Toggle off markerClusters by default
-					toggleMC();
-
-					//Set a callback to enable the btn so the user can't spam the btn
-					/*setTimeout(function() {
-						//Enable btn
-						displayBtnDisabled = false
-						document.getElementById("displayBtn").disabled = false;
-					}, 500)*/
 					google.maps.event.addListenerOnce(map, 'idle', function() {
 						console.log('Map is now idle');
 						/*console.log(map.getCenter());*/
@@ -836,7 +738,120 @@ return
 			});
 		}
 
+		function readGridJSON(path) {
+			console.log("About to read JSON file..");
+
+			$.ajax({
+				dataType: 'json',
+				url: path,
+				error: function() {
+					//Data points directory doesn't exist
+					console.log("ERROR: couldn't read Grid JSON file '" + path + "'. Exiting...");
+					document.getElementById("displayBtn").disabled = false;
+					return					
+				},
+				success: function(json) {
+					console.log("read JSON file!")
+
+					for(var i = 0; i < json.elements.length; i++) {
+						for(var j = 0; j < json.elements[i].length; j++) {
+                    		//Circle
+                    		var myIcon = new google.maps.MarkerImage("http://worldartsme.com/images/clip-art-red-dot-clipart-1.jpg", null, null, null, new google.maps.Size(10,10));
+
+							//Create a new marker
+							var marker=new google.maps.Marker({
+								icon: myIcon,
+								position: new google.maps.LatLng(json.elements[i][j].weightedPoint[0], json.elements[i][j].weightedPoint[1])
+							});
+
+							markerWeights.push(json.elements[i][j].density)
+
+							//console.log(typeof(json.photos.photo[i].latitude));
+							//Don't show markers by default
+							//marker.setMap(map);
+							markers.push(marker);
+						}
+					}
+					makeGridHeatMap();
+					//Show heatmap by default
+					heatmap.setMap(map);
+					//toggleMarkers();
+
+					//Set bounds so google maps' zoom encompasses all markers
+					var bounds = new google.maps.LatLngBounds();
+					for (var i = 0; i < markers.length; i++) {
+						bounds.extend(markers[i].getPosition());
+					}
+					//Set the map's zoom
+					map.fitBounds(bounds);
+
+					document.getElementById()
+
+					//Zoom in one extra level
+					//zoomLv = map.getZoom();
+					//map.setZoom(zoomLv + 1);
+
+					//Now enable toggle buttons
+					enableToggleButtons();				
+		/*
+					//Create a new marker
+					var marker=new google.maps.Marker({
+						position: new google.maps.LatLng(json.topLeftBound[0], json.topLeftBound[1])
+					});
+
+	
+					markers.push(marker)
+
+					//Create a new marker
+					var marker=new google.maps.Marker({
+						position: new google.maps.LatLng(json.botRightBound[0], json.botRightBound[1])
+					});
+
+					markers.push(marker)
+
+
+					for(var i = 0; i < json.elements.length; i++) {
+						for(var j = 0; j < json.elements[i].length; j++) {
+                    		//Circle
+                    		var myIcon = new google.maps.MarkerImage("http://worldartsme.com/images/clip-art-red-dot-clipart-1.jpg", null, null, null, new google.maps.Size(10,10));
+
+                    		console.log(json.elements[i][j].topLeftBound[0])
+                    		console.log(json.elements[i][j].topLeftBound[1])
+							//Create a new marker
+							var marker=new google.maps.Marker({
+								icon: myIcon,
+								position: new google.maps.LatLng(json.elements[i][j].topLeftBound[0], json.elements[i][j].topLeftBound[1])
+							});
+
+							//console.log(typeof(json.photos.photo[i].latitude));
+							//Don't show markers by default
+							//marker.setMap(map);
+							markers.push(marker);
+
+							//Create a new marker
+							var marker=new google.maps.Marker({
+								position: new google.maps.LatLng(json.elements[i][j].botRightBound[0], json.elements[i][j].botRightBound[1])
+							});
+							markers.push(marker)
+						}
+					}
+					console.log(markers.length)*/
+				}
+			});
+		}
+
 		function readJSONFiles(year, month, place) {
+
+			/*Check values to ensure something was picked*/
+			if(month == "Month " || year == "Year ") {
+				console.log("Month or year not selected. Returning...")
+				return
+			}
+			else {
+				console.log(month)
+				console.log(year)
+			}			
+
 			/*Disable "Display Locations" btn until done*/
 			console.log("disabling btn");
 			document.getElementById("displayBtn").disabled = true;
@@ -1028,6 +1043,8 @@ return
     var map;
     var markers = [];
     var heatMapData = [];
+    var markerWeights = [];
+    var clusters = []
     var heatmap;
     var zoom = 5;
 		//Variable to keep track if the displayBtn was attempted to be disabled
@@ -1056,9 +1073,9 @@ return
         centerControlDiv.index = 1;
         map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(centerControlDiv);
 
-		google.maps.event.addListener(map,'click',function(event) { 
-			console.log(event.latLng.lat() + ', ' + event.latLng.lng())
-		})
+        google.maps.event.addListener(map,'click',function(event) { 
+        	console.log(event.latLng.lat() + ', ' + event.latLng.lng())
+        })
 
 
     }
@@ -1178,6 +1195,17 @@ return
     	function toggleMC() {
     		//console.log(markerCluster.getTotalMarkers())
 
+
+    		console.log(clusters.length)
+    		for(var i = 0; i < clusters.length; i++) {
+    			if(clusters[i].getMap() == null) {
+    				clusters[i].setMap(map);
+    			}
+    			else {
+    				clusters[i].setMap(null);
+    			}
+    		}
+
     		//Toggle marker cluster's text
     		if($("#toggleMC").text() == "Hide Clusters") {
     			$("#toggleMC").text("Show Clusters");
@@ -1185,24 +1213,6 @@ return
     		else {
     			$("#toggleMC").text("Hide Clusters");
     		}   		
-
-    		if(markerCluster.getTotalMarkers() == 0) {
-    			console.log("Creating markerClusters..")
-    			//console.log(markerCluster.getTotalMarkers())
-				//Set markerCluster
-				var options = {
-					imagePath: 'images/m',
-					averageCenter: true
-				};
-
-				markerCluster = new MarkerClusterer(map, markers, options);
-				//markerCluster.redraw();
-			}
-			else {
-				console.log("Clearing " + markerCluster.getTotalClusters() + " Clusters...")
-       			//console.log(markerCluster.getTotalMarkers())
-       			markerCluster.clearMarkers();
-       		}
        	}
 
        	function changeGradient() {
@@ -1278,62 +1288,10 @@ return
 
 		googleMapsLoaded = false;
 
-		//Given a place, year, and month
-		//Load the correponsing JSON file, map it to google maps, init the clustering, set the zoom level
-		//Retreive a list of clusters and their lat + longs
-		//Reverse lookup each lat + long, put it into a JSON style format
-		//Return the 
-		function getHotSpotJSON(year, month, place, zoom) {
-			HSreadJSONFiles(year, month, place);
-
-			map.setZoom(zoom)
-			tot = markerCluster.getTotalClusters();
-			console.log(tot)
-
-
-			//Override function to get ALL cluster spots (even outside of viewport)
-			MarkerClusterer.prototype.createClusters_ = function() {
-				if (!this.ready_) {
-					return;
-				}
-
-				for (var i = 0, marker; marker = this.markers_[i]; i++) {
-   			 	//if (!marker.isAdded && this.isMarkerInBounds_(marker, bounds)) {    
-   			 		if (!marker.isAdded) {    
-   			 			this.addToClosestCluster_(marker);
-   			 		}
-   			 	}
-   			 };
-
-
-   			 google.maps.event.addListenerOnce(map, 'idle', function(){
-			 	//Toggle cluters on
-				//toggleMC();
-				console.log(markers.length)
-
-				console.log("Idle, total clusters: " + markerCluster.getTotalClusters());
-				googleMapsLoaded = true;
-				var clusters = markerCluster.getClusters();
-				var result = "";
-				for(var i = 0; i < clusters.length; i++) {
-    				//console.log(clusters[i].getCenter().lat());
-       				//console.log(clusters[i].getCenter().lng());
-       				result += i + ": " + clusters[i].getCenter().lat() + " " + clusters[i].getCenter().lng() + "\n";
-       			}
-       			alert(result);
-       		});
-
-   			 //return tot
-   			}
-
-   			function myButton(){
-   				var btn = $('<div class="my-button"></div>');
-   				btn.bind('click', function(){
-        		// logic here...
-        		alert('button clicked!');
-        	});
-   				return btn[0];
-   			}
+   		function showGrid() {
+			readGridJSON("clusterTest.json")
+			toggleMarkers()
+   		}
 
    		</script>
    	</head>  
@@ -1423,8 +1381,12 @@ return
 	<!--Top btns-->
 	<center>
 		<!--Number of geo locations displayed-->
-		<b>Number of geolocations displayed:</b>
+		<b>Geolocations:</b>
 		<b id="numDisplayed">0</b>
+		<b> Grid Elements:</b>
+		<b id="gridDisplayed">0</b>
+		<b> Clusters:</b>
+		<b id="clustersDisplayed">0</b>
 	</center>
 
 	<!--Place Selection dropdowns-->
@@ -1512,6 +1474,5 @@ return
 		<!--<p id="filesReturned"></p>-->
 		<p id="filesReturned" style="display:none"></p> 
 	</div>
-
 </body>  
 </html>  
