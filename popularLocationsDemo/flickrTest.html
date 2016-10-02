@@ -1249,7 +1249,7 @@ return
    					<div class="modal-body">
    						<span><strong>About this project:</strong><br> The ultimate goal of this project is create a webpage that will show the most popular locations to travel to around the world. You'll be able to enter in a city from any country at any time of the year and know what places you should visit and what local events are happening.</span><br><br>
 
-   						<span><strong>Technical Overview:</strong><br> This project uses flickr to obtain hundreds of thousands of picture locations. Each picture has a latitude, longitude, and date in which it was taken. A local python script uses the flickr api to create JSON files of picture locations. The user specifies a month of a given year and then what city they want displayed. The corresponding JSON file is read and the locations are mapped using the google maps api. A heatmap layer is then applied to the map so it's easier to see where the most activity is.</span>
+   						<span><strong>Technical Overview:</strong><br> This project uses the geolocations from photo sharing websites to display popular locations to visit on google map's api. The geolocations are processed to display information without lagging google maps.</span>
 
    					</div>
    					<div class="modal-footer">
