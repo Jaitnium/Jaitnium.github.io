@@ -8,8 +8,12 @@ body {
 }
 .navbar .navbar-collapse {
 	text-align: center;
-    background-color:rgb(255,255,255);
-    margin:0px;
+}
+
+#navbar {
+	text-align: center;
+	background-color: rgb(255,255,255);
+	margin: 0px;
 }
 
 #container {
