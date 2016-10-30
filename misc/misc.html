@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<link href="https://fonts.googleapis.com/css?family=Bree+Serif" rel="stylesheet">
+
+	<link rel="stylesheet" type="text/css" href="css/misc.css">
+
+	<title>Other Projects</title>
+</head>
+
+<body>
+
+	<!--Navigation Bar-->
+	<nav class="navbar navbar-static-top navbar-default" style="text-align:center;background-color:rgb(255,255,255);margin:0px">
+		<div class="container-fluid">
+			<ul class="nav navbar-nav">
+				<li><a href="../index.html">Home</a></li>
+				<li class="dropdown">
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#">My Projects
+						<span class="caret"></span>
+					</a>
+					<ul class="dropdown-menu" style="text-align: center">
+						<li><a href="../globalTimezones/globalTimezones.html">Global Timezones</a></li>
+						<li><a href="../dogBreedFinder/dogBreedFinder.html">Dog Breed Finder</a></li>
+						<li><a href="../popularLocationsDemo/flickrTest.html">Popular Locations Tech Demo</a></li>
+						<li><a href="#">Other Projects</a></li>
+					</ul>
+				</li>
+				<li data-toggle="modal" data-target="#contactModal"><a href="#">Contact</a></li>
+				<li><a href="../Matthew Antosiak.pdf">Resume</a></li>
+			</ul>
+		</div>
+	</nav>
+	<!--Contact Modal-->
+	<div id="contactModal" class="modal fade" fole="dialog">
+		<div class="modal-dialog modal-sm">
+			<!--Modal Content-->
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">Contact</h4>
+				</div>
+				<div class="modal-body">
+					<span><strong>Cell Phone:</strong>  650-380-6982 </span><br>
+					<span><strong>Email:</strong> matthewaantosiak@gmail.com</span>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="container" id="bunnyProject">
+		<div class="row vertical-middle">
+			<div class="col-md-6">
+				<iframe width="100%" height="400" src="https://www.youtube.com/embed/-ZcC142pG9k"></iframe>
+			</div>
+			<div class="col-md-6 text-left projectDescription">
+				<h1>Bunny Parkour</h1>
+				<p><span style="font-weight:bold">Summary:</span> Final project for an introdutory graphics course. Uses many of the themes taught in the course such as 3D model loading, shading, texture mapping, directional lighting, collision detection, and camera calculations. The <a href="https://en.wikipedia.org/wiki/Stanford_bunny" id="bunnyLink" target="_blank">Stanford bunny</a> was a reoccuring theme in the class, so I felt it necessary to include it in my project. I dedicated a large portion of time teaching myself collision detection because of how exciting the project was. I spent three weeks crafting this game and it was voted the #1 best project among my class.
+				</p>
+				<p><span style="font-weight:bold">Role:</span> Main Programmer</p>
+				<p><span style="font-weight:bold">Technologies:</span> C++, OpenGL/GLUT</p>
+			</div>
+		</div>
+	</div>
+	<div class="container" id="grapplingProject">
+		<div class="row vertical-middle">
+			<div class="col-md-6 col-md-push-6">
+				<iframe width="100%" height="400" src="https://www.youtube.com/embed/fZi2FjAbT6k"></iframe>
+			</div>
+			<div class="col-md-6 col-md-pull-6 text-left projectDescription">
+				<h1>Grapple</h1>
+				<p><span style="font-weight:bold">Summary:</span> A game that was created in a ten week long graphics course completed by six members. The project is composed of many technologies such as animation, sound, shading, shadows, cell shading, and a physics engine. More details can be found <a href="http://users.csc.calpoly.edu/~zwood/teaching/csc476/final14/grapple/#guide" target="_blank">here.</a>
+				</p>
+				<p><span style="font-weight:bold">Role:</span> Group Leader, Level Editor/Builder, UI Builder</p>
+				<p><span style="font-weight:bold">Technologies:</span> C++, OpenGL/GLFW</p>
+			</div>
+
+		</div>
+	</div>
+</body>
+</html>
